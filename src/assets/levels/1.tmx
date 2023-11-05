@@ -171,6 +171,11 @@
   <tile id="20">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="slope" type="bool" value="true"/>
+    <property name="slopeAngle" type="float" value="0.7"/>
+    <property name="slopeEntryHeight" type="float" value="0"/>
+    <property name="slopeEntrySide" value="RIGHT"/>
+    <property name="slopeExitHeight" type="float" value="1"/>
    </properties>
    <objectgroup draworder="index">
     <object id="1" x="0" y="0">
@@ -205,6 +210,11 @@
   <tile id="24">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="slope" type="bool" value="true"/>
+    <property name="slopeAngle" type="float" value="0.3"/>
+    <property name="slopeEntryHeight" type="float" value="0.5"/>
+    <property name="slopeEntrySide" value="RIGHT"/>
+    <property name="slopeExitHeight" type="float" value="1"/>
    </properties>
    <objectgroup draworder="index">
     <object id="1" x="0" y="0">
@@ -215,6 +225,11 @@
   <tile id="25">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="slope" type="bool" value="true"/>
+    <property name="slopeAngle" type="float" value="0.3"/>
+    <property name="slopeEntryHeight" type="float" value="0"/>
+    <property name="slopeEntrySide" value="RIGHT"/>
+    <property name="slopeExitHeight" type="float" value="0.5"/>
    </properties>
    <objectgroup draworder="index">
     <object id="1" x="32" y="24">
@@ -254,6 +269,11 @@
   <tile id="30">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="slope" type="bool" value="true"/>
+    <property name="slopeAngle" type="float" value="0.3"/>
+    <property name="slopeEntryHeight" type="float" value="0.5"/>
+    <property name="slopeEntrySide" value="RIGHT"/>
+    <property name="slopeExitHeight" type="float" value="1"/>
    </properties>
    <objectgroup draworder="index">
     <object id="1" x="0" y="0">
@@ -402,6 +422,11 @@
   <tile id="52">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="slope" type="bool" value="true"/>
+    <property name="slopeAngle" type="float" value="-0.3"/>
+    <property name="slopeEntryHeight" type="float" value="0"/>
+    <property name="slopeEntrySide" value="LEFT"/>
+    <property name="slopeExitHeight" type="float" value="0.5"/>
    </properties>
    <objectgroup draworder="index">
     <object id="1" x="0" y="24">
@@ -412,6 +437,11 @@
   <tile id="53">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="slope" type="bool" value="true"/>
+    <property name="slopeAngle" type="float" value="-0.3"/>
+    <property name="slopeEntryHeight" type="float" value="0.5"/>
+    <property name="slopeEntrySide" value="LEFT"/>
+    <property name="slopeExitHeight" type="float" value="1"/>
    </properties>
    <objectgroup draworder="index">
     <object id="1" x="0.110803" y="11.6343">
@@ -442,6 +472,11 @@
   <tile id="56">
    <properties>
     <property name="collides" type="bool" value="true"/>
+    <property name="slope" type="bool" value="true"/>
+    <property name="slopeAngle" type="float" value="-0.7"/>
+    <property name="slopeEntryHeight" type="float" value="0"/>
+    <property name="slopeEntrySide" value="LEFT"/>
+    <property name="slopeExitHeight" type="float" value="1"/>
    </properties>
    <objectgroup draworder="index">
     <object id="1" x="0" y="24">

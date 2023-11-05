@@ -45,18 +45,18 @@ export default class GameplayScene extends Phaser.Scene{
                 // blocker test
                 if (this.lemmings.length === 2)
                     setTimeout(()=>{
-                        lemming.block();
+                        lemming.assignBlock();
                     },7000)
 
                 // dig sideways test
-                /*if (this.lemmings.length === 1)
-                    setTimeout(()=>{
-                        lemming.assignDigSideways();
-                    },15000)*/
                 if (this.lemmings.length === 1)
                     setTimeout(()=>{
+                        lemming.assignDigSideways();
+                    },15000)
+                /*if (this.lemmings.length === 1)
+                    setTimeout(()=>{
                         lemming.assignDigDown();
-                    },14600)
+                    },14600)*/
 
                 break;
             case "Entrance":
@@ -86,6 +86,7 @@ export default class GameplayScene extends Phaser.Scene{
             
             if (object.name=="Entrance")
                 this.maxLemmings=object.properties![0].value;
+                //this.maxLemmings=1;
             else if (object.name=="Exit")
                 this.lemmingsRequired=object.properties![0].value;
         })
