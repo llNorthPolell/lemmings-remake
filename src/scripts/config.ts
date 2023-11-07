@@ -24,7 +24,7 @@ export const config = {
         default: 'arcade',
         arcade:{
             gravity: {y: gravity},
-
+            debug: true
         }
     }
 }

@@ -5,23 +5,25 @@ import { ANIMS } from "../enums/keys/animations";
 import { ASSETS } from "../enums/keys/assets";
 import { LemmingTask } from "../enums/lemmingTasks";
 import StateManager, { State } from "./components/stateManager";
+import Context from "./context";
 
 
 const MOVESPEED = 25;
+const LEMMING_SIZE = {width:16, height:16};
 
 export default class Lemming extends GameObject{
-    // global physics
-    private tileImageLayer :Phaser.Tilemaps.TilemapLayer;
-    private physics: Phaser.Physics.Arcade.ArcadePhysics;
-    private lemmingColliders: Phaser.Physics.Arcade.Group;
-
     // lemming specific
-    //private status: LemmingStatus;
+    private sprite : Phaser.Physics.Arcade.Sprite;
+    private lemmingFrontSensor : Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
+    private lemmingGroundSensor : Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
+
     private stateManager : StateManager
     private task: LemmingTask;
     private direction: Direction;
-    private sprite : Phaser.Physics.Arcade.Sprite;
     private animation: string;
+
+    private standingTile:  Phaser.Tilemaps.Tile | undefined;
+    private bumpTile: Phaser.Tilemaps.Tile | undefined;
 
     // states
     private idle : State | undefined = undefined; 
@@ -30,34 +32,71 @@ export default class Lemming extends GameObject{
     private digSideways : State| undefined = undefined; 
     private blocking : State| undefined = undefined; 
 
-    constructor(position: {x:number, y: number}, 
-                physics: Phaser.Physics.Arcade.ArcadePhysics,
-                tileImageLayer: Phaser.Tilemaps.TilemapLayer,
-                lemmingColliders: Phaser.Physics.Arcade.Group){
+    constructor(position: {x:number, y: number}){
         super({x:position.x, y:position.y});
-        this.tileImageLayer = tileImageLayer;
-        this.physics = physics;
-        this.lemmingColliders=lemmingColliders;
 
         this.task = LemmingTask.IDLE;
         this.direction=Direction.RIGHT;
+        //this.direction=Direction.LEFT;
         this.animation = ANIMS.FALLING;
 
-        this.sprite = physics.add.sprite(
+        this.standingTile=undefined;
+        this.bumpTile=undefined;
+
+        this.sprite = Context.physics.add.sprite(
             position.x,
             position.y, 
             ASSETS.LEMMING_SPRITESHEET
         );
 
-        physics.add.collider(this.sprite, this.tileImageLayer!);
-        this.lemmingColliders!.add(this.sprite);
+        // for detecting if lemming is running into a wall
+        this.lemmingFrontSensor=Context.scene.add.rectangle(
+            0,0,LEMMING_SIZE.width/4,LEMMING_SIZE.height/4,0xffff00,0.5
+        ) as unknown as Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
+        Context.physics.add.existing(this.lemmingFrontSensor);
+        this.lemmingFrontSensor.body.allowGravity=false;
+
+        Context.physics.add.overlap(this.lemmingFrontSensor,Context.tileImageLayer,
+            (frontSensor,tile)=>{
+                if (tile !== this.bumpTile){
+                    this.bumpTile = tile as Phaser.Tilemaps.Tile;
+                }
+            },
+            (frontSensor, tile)=>{
+                return (tile as  Phaser.Tilemaps.Tile).collides;
+            },
+            this
+        );
+
+        // for detecting if lemming is standing on ground
+        this.lemmingGroundSensor=Context.scene.add.rectangle(
+            0,0,1,1,0x00ffff,0.5
+        ) as unknown as Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
+        Context.physics.add.existing(this.lemmingGroundSensor);
+        this.lemmingGroundSensor.body.allowGravity=false;
+
+        Context.physics.add.overlap(this.lemmingGroundSensor,Context.tileImageLayer,
+            (frontSensor,tile)=>{
+                if (tile !== this.standingTile){
+                    this.standingTile = tile as Phaser.Tilemaps.Tile;
+                }
+            },
+            (frontSensor, tile)=>{
+                return (tile as  Phaser.Tilemaps.Tile).collides;
+            },
+            this
+        );
+
+        // for stopping lemming from falling through ground
+        Context.physics.add.collider(this.sprite, Context.tileImageLayer); 
+        Context.lemmingColliders!.add(this.sprite);
 
         this.initStates();
         this.stateManager = new StateManager(this.falling!);
     }
 
 
-    initStates(){       
+    private initStates(){       
         this.falling = {
             name: LemmingStates.FALLING,
             entryCondition: ()=>{return !this.isTouchingGround()},
@@ -95,23 +134,24 @@ export default class Lemming extends GameObject{
         this.blocking.nextState=this.falling;
     }
 
-    turnAround(){
+    private turnAround(){
         if (this.direction===Direction.RIGHT)
             this.direction=Direction.LEFT;
         else if (this.direction===Direction.LEFT)
             this.direction=Direction.RIGHT;
+        
     }
 
     getSprite(){
         return this.sprite;
     }
 
-    setSlopeMovement(slopeAngle:number){
+    private setSlopeMovement(slopeAngle:number){
         this.sprite.setRotation(slopeAngle);
         this.sprite.setOffset(0,-10);
     }
 
-    updateVelocity(){
+    private updateVelocity(){
         const state = this.stateManager.getState();
         if (state===this.idle){
             if (this.direction===Direction.RIGHT)
@@ -122,7 +162,7 @@ export default class Lemming extends GameObject{
         else this.sprite.setVelocityX(0);      
     }
 
-    updateAnimation(){
+    private updateAnimation(){
         let animation = this.animation;
         const state = this.stateManager.getState();
         if (state===this.idle)
@@ -150,42 +190,59 @@ export default class Lemming extends GameObject{
         }
     }
 
-    getNearbyTile(direction: Direction, distance=1){
-        const body = this.sprite.body!;
-        const tileX= Math.floor(body.x/32);
-        const tileY = Math.floor(body.y/24);
-
-        switch (direction){
-            case Direction.LEFT:
-                return this.tileImageLayer.getTileAt(tileX-distance,tileY);
-            case Direction.RIGHT:
-                return this.tileImageLayer.getTileAt(tileX+distance,tileY);
-            case Direction.DOWN:
-                return this.tileImageLayer.getTileAt(tileX,tileY+distance);
-            default:
-                return undefined;
-        }
-    }
-
-
-    isTouchingGround(){
+    private isTouchingGround(){
         return this.sprite.body!.blocked.down;
     }
 
-    doIdle(){
-        const body = this.sprite.body!;
-        if ((body.blocked.left && this.direction===Direction.LEFT) || 
-            (body.blocked.right && this.direction===Direction.RIGHT)
-            && this.task !== LemmingTask.DIG_SIDEWAYS){
-            this.turnAround();
-            return;
-        }
-
-        if (!this.isTouchingGround()){
+    private doIdle(){
+        if (!this.isTouchingGround() /*&& !standingTile */){
             this.stateManager.tryNext(LemmingStates.FALLING);
             return;
         }
-        
+
+        const body = this.sprite.body!;
+        if (this.task !== LemmingTask.DIG_SIDEWAYS){
+            if ((body.blocked.left && this.direction===Direction.LEFT) || 
+                (body.blocked.right && this.direction===Direction.RIGHT)){
+                this.turnAround();
+                return;
+            }
+        }
+          
+        if (this.standingTile){
+            const properties = this.standingTile.properties;
+            const tileBotY = this.standingTile.getBottom();     
+            const tileLeftX = this.standingTile.getLeft();
+
+            /*if (properties?.slopeTile){
+                // let tileLeftX = x_1, m=properties.slopeValue
+                // let x_0 = 0, y_0 = b (result from y=mx+b when x=0)
+                // y_0-y_1 / x_0-x_1 = m
+
+
+                // properties.leftHeight is value between 0 and 1 to represent height between 0 and 24 in Tiled properties
+                const y1 = ((-properties.leftHeight)*24) + tileBotY;
+                
+                // b= (m*deltaX)+y_1, where deltaX=x_0-x_1=0-x_1=-x_1
+                const deltaX = -tileLeftX 
+                const b = (properties.slopeValue * deltaX)+y1; // if m=-0.375,deltaX=-96,y1=216, then b=252
+
+
+                //console.log(`m=${properties.slopeValue},deltaX=${deltaX},b=${b},y1=${y1}`);
+
+                // lemming height = 16, and sprite coordinates are top left corner. Take bottom right corner instead.
+                const correctedY=(properties.slopeValue*(body.x))+b;
+                
+                // since offsets can only be applied from top right corner, add lemming height back
+                const offsetY=(b-correctedY)-40;
+                console.log("Corrected Y: " + correctedY+ ", Offset Y:" + offsetY);
+                body.setOffset(16, offsetY-16);
+            }
+            else {
+                body.setOffset(0,0);
+            }*/
+        }
+
         switch (this.task){
             case LemmingTask.BLOCK:
                 this.stateManager.tryNext(LemmingStates.BLOCKING);
@@ -201,9 +258,16 @@ export default class Lemming extends GameObject{
         }   
     }
 
-    doFalling(){
-        if (this.isTouchingGround())
+    private doFalling(){
+        const body = this.sprite.body!;
+        if (body.offset.y !=0)
+            body.setOffset(0,0);
+
+        if (this.isTouchingGround() && this.standingTile){
             this.stateManager.tryNext(LemmingStates.IDLE);
+            return;
+        }
+        this.standingTile=undefined;
     }
 
     assignDigSideways(){
@@ -215,30 +279,27 @@ export default class Lemming extends GameObject{
         return (
             (body.blocked.right||body.blocked.left)
             && this.task===LemmingTask.DIG_SIDEWAYS
+            && this.bumpTile
         );
     }
 
-    doDigSideways(){
+    private doDigSideways() {
         const body = this.sprite.body!;
-        let tileToRemoveX :number|undefined = undefined;
-        const tileToRemoveY = Math.floor(body.y/24);
-        
-        if (body.blocked.right)
-            tileToRemoveX = Math.floor(body.x/32)+1;
-        else if (body.blocked.left)
-            tileToRemoveX = Math.floor(body.x/32)-1;
-        
-        if (tileToRemoveX || tileToRemoveX===0){
-            console.log("Destroy tile at X="+tileToRemoveX);
-            setTimeout(()=>{
-                this.tileImageLayer?.removeTileAt(tileToRemoveX!,tileToRemoveY);
+        if ((body.blocked.right && this.direction===Direction.RIGHT) || 
+            (body.blocked.left && this.direction===Direction.LEFT))
+            setTimeout(() => {
+                console.log("Destroy tile at X=" + this.bumpTile!.x);
+                Context.tileImageLayer?.removeTileAt(this.bumpTile!.x, this.bumpTile!.y);
                 this.stateManager.tryNext(LemmingStates.IDLE);
 
-                if (!this.getNearbyTile(this.direction,2))
-                    this.task=LemmingTask.IDLE;
-                
-            },5000)
-        }
+                const nextTileX = this.bumpTile!.x + (
+                    (this.direction === Direction.LEFT) ? -1 : +1
+                );
+
+                if (!Context.tileImageLayer.getTileAt(nextTileX, this.bumpTile!.y))
+                    this.task = LemmingTask.IDLE;
+            }, 5000)
+
     }
 
     assignBlock(){
@@ -249,10 +310,10 @@ export default class Lemming extends GameObject{
         return this.isTouchingGround() && this.task===LemmingTask.BLOCK;
     }
 
-    doBlockingEnter(){
+    private doBlockingEnter(){
         console.log("Blocking");
         this.sprite.body!.immovable=true;
-        this.physics.add.collider(this.sprite,this.lemmingColliders);
+        Context.physics.add.collider(this.sprite,Context.lemmingColliders);
 
     }
 
@@ -264,28 +325,45 @@ export default class Lemming extends GameObject{
         return this.isTouchingGround() && this.task===LemmingTask.DIG_DOWN;
     }
 
-    doDigDown(){
+    private doDigDown(){
         const body = this.sprite.body!;
         const tileToRemoveX = Math.floor(body.x/32);
         const tileToRemoveY = Math.floor(body.y/24)+1;
         body.position.x = (tileToRemoveX*32)+8;    // center lemming on tile to dig
 
         setTimeout(()=>{   
-            this.tileImageLayer?.removeTileAt(tileToRemoveX,tileToRemoveY);
+            Context.tileImageLayer?.removeTileAt(tileToRemoveX,tileToRemoveY);
             
             let nextTileY = tileToRemoveY+1;
 
-            if (!this.tileImageLayer.getTileAt(tileToRemoveX,nextTileY)){
+            if (!Context.tileImageLayer.getTileAt(tileToRemoveX,nextTileY)){
                 this.task=LemmingTask.IDLE;
                 this.stateManager.tryNext(LemmingStates.FALLING);
             }
         },5000)
     }
 
+
+    private updateFrontSensor(){
+        if (this.direction===Direction.RIGHT)
+            this.lemmingFrontSensor.x=this.sprite.x+LEMMING_SIZE.width;
+        else if (this.direction===Direction.LEFT) 
+            this.lemmingFrontSensor.x=this.sprite.x-LEMMING_SIZE.width;
+        
+        this.lemmingFrontSensor.y=this.sprite.y;
+    }
+
+    private updateGroundSensor(){
+        this.lemmingGroundSensor.x=this.sprite.x;
+        this.lemmingGroundSensor.y=this.sprite.y + LEMMING_SIZE.height;
+    }
+
     update(){
         this.stateManager.update();
         this.updateAnimation();
         this.updateVelocity();
+        this.updateFrontSensor();
+        this.updateGroundSensor();
     }
 }
 

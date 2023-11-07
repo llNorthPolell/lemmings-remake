@@ -35,7 +35,7 @@
                  "type":"",
                  "visible":true,
                  "width":32,
-                 "x":128,
+                 "x":96,
                  "y":120
                 }, 
                 {
@@ -818,29 +818,24 @@
                          "value":true
                         }, 
                         {
-                         "name":"slope",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"slopeAngle",
+                         "name":"leftHeight",
                          "type":"float",
-                         "value":0.7
+                         "value":1
                         }, 
                         {
-                         "name":"slopeEntryHeight",
+                         "name":"rightHeight",
                          "type":"float",
                          "value":0
                         }, 
                         {
-                         "name":"slopeEntrySide",
-                         "type":"string",
-                         "value":"RIGHT"
+                         "name":"slopeTile",
+                         "type":"bool",
+                         "value":true
                         }, 
                         {
-                         "name":"slopeExitHeight",
+                         "name":"slopeValue",
                          "type":"float",
-                         "value":1
+                         "value":0.75
                         }]
                 }, 
                 {
@@ -986,29 +981,24 @@
                          "value":true
                         }, 
                         {
-                         "name":"slope",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"slopeAngle",
+                         "name":"leftHeight",
                          "type":"float",
-                         "value":0.3
+                         "value":1
                         }, 
                         {
-                         "name":"slopeEntryHeight",
+                         "name":"rightHeight",
                          "type":"float",
                          "value":0.5
                         }, 
                         {
-                         "name":"slopeEntrySide",
-                         "type":"string",
-                         "value":"RIGHT"
+                         "name":"slopeTile",
+                         "type":"bool",
+                         "value":true
                         }, 
                         {
-                         "name":"slopeExitHeight",
+                         "name":"slopeValue",
                          "type":"float",
-                         "value":1
+                         "value":0.375
                         }]
                 }, 
                 {
@@ -1055,29 +1045,24 @@
                          "value":true
                         }, 
                         {
-                         "name":"slope",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"slopeAngle",
+                         "name":"leftHeight",
                          "type":"float",
-                         "value":0.3
+                         "value":0.5
                         }, 
                         {
-                         "name":"slopeEntryHeight",
+                         "name":"rightHeight",
                          "type":"float",
                          "value":0
                         }, 
                         {
-                         "name":"slopeEntrySide",
-                         "type":"string",
-                         "value":"RIGHT"
+                         "name":"slopeTile",
+                         "type":"bool",
+                         "value":true
                         }, 
                         {
-                         "name":"slopeExitHeight",
+                         "name":"slopeValue",
                          "type":"float",
-                         "value":0.5
+                         "value":0.375
                         }]
                 }, 
                 {
@@ -1231,29 +1216,24 @@
                          "value":true
                         }, 
                         {
-                         "name":"slope",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"slopeAngle",
+                         "name":"leftHeight",
                          "type":"float",
-                         "value":0.3
+                         "value":1
                         }, 
                         {
-                         "name":"slopeEntryHeight",
+                         "name":"rightHeight",
                          "type":"float",
                          "value":0.5
                         }, 
                         {
-                         "name":"slopeEntrySide",
-                         "type":"string",
-                         "value":"RIGHT"
+                         "name":"slopeTile",
+                         "type":"bool",
+                         "value":true
                         }, 
                         {
-                         "name":"slopeExitHeight",
+                         "name":"slopeValue",
                          "type":"float",
-                         "value":1
+                         "value":0.375
                         }]
                 }, 
                 {
@@ -1733,29 +1713,24 @@
                          "value":true
                         }, 
                         {
-                         "name":"slope",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"slopeAngle",
-                         "type":"float",
-                         "value":-0.3
-                        }, 
-                        {
-                         "name":"slopeEntryHeight",
+                         "name":"leftHeight",
                          "type":"float",
                          "value":0
                         }, 
                         {
-                         "name":"slopeEntrySide",
-                         "type":"string",
-                         "value":"LEFT"
-                        }, 
-                        {
-                         "name":"slopeExitHeight",
+                         "name":"rightHeight",
                          "type":"float",
                          "value":0.5
+                        }, 
+                        {
+                         "name":"slopeTile",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"slopeValue",
+                         "type":"float",
+                         "value":-0.375
                         }]
                 }, 
                 {
@@ -1806,29 +1781,24 @@
                          "value":true
                         }, 
                         {
-                         "name":"slope",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"slopeAngle",
-                         "type":"float",
-                         "value":-0.3
-                        }, 
-                        {
-                         "name":"slopeEntryHeight",
+                         "name":"leftHeight",
                          "type":"float",
                          "value":0.5
                         }, 
                         {
-                         "name":"slopeEntrySide",
-                         "type":"string",
-                         "value":"LEFT"
-                        }, 
-                        {
-                         "name":"slopeExitHeight",
+                         "name":"rightHeight",
                          "type":"float",
                          "value":1
+                        }, 
+                        {
+                         "name":"slopeTile",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"slopeValue",
+                         "type":"float",
+                         "value":-0.375
                         }]
                 }, 
                 {
@@ -2003,29 +1973,24 @@
                          "value":true
                         }, 
                         {
-                         "name":"slope",
-                         "type":"bool",
-                         "value":true
-                        }, 
-                        {
-                         "name":"slopeAngle",
-                         "type":"float",
-                         "value":-0.7
-                        }, 
-                        {
-                         "name":"slopeEntryHeight",
+                         "name":"leftHeight",
                          "type":"float",
                          "value":0
                         }, 
                         {
-                         "name":"slopeEntrySide",
-                         "type":"string",
-                         "value":"LEFT"
-                        }, 
-                        {
-                         "name":"slopeExitHeight",
+                         "name":"rightHeight",
                          "type":"float",
                          "value":1
+                        }, 
+                        {
+                         "name":"slopeTile",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"slopeValue",
+                         "type":"float",
+                         "value":-0.75
                         }]
                 }, 
                 {
