@@ -3,7 +3,7 @@ import Phaser from "phaser";
 
 const canvasSize = {
     width:800,
-    height:600,
+    height:800,
 }
 
 //const gravity = 0.0981;

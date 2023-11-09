@@ -6,42 +6,42 @@ import { ASSETS } from "../enums/keys/assets";
 import { LemmingTask } from "../enums/lemmingTasks";
 import StateManager, { State } from "./components/stateManager";
 import Context from "./context";
+import SensorBox from "./components/sensorBox";
 
 
 const MOVESPEED = 25;
 const LEMMING_SIZE = {width:16, height:16};
 
 export default class Lemming extends GameObject{
+    private id: string;
+
     // lemming specific
     private sprite : Phaser.Physics.Arcade.Sprite;
-    private lemmingFrontSensor : Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
-    private lemmingGroundSensor : Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
+    private lemmingFrontSensor : SensorBox;
+    private lemmingGroundSensor : SensorBox;
 
     private stateManager : StateManager
     private task: LemmingTask;
     private direction: Direction;
     private animation: string;
 
-    private standingTile:  Phaser.Tilemaps.Tile | undefined;
-    private bumpTile: Phaser.Tilemaps.Tile | undefined;
+    private standingTile?:  Phaser.Tilemaps.Tile;
+    private bumpTile?: Phaser.Tilemaps.Tile;
 
     // states
-    private idle : State | undefined = undefined; 
-    private falling : State| undefined = undefined;  
-    private digDown : State| undefined = undefined; 
-    private digSideways : State| undefined = undefined; 
-    private blocking : State| undefined = undefined; 
+    private idle? : State; 
+    private falling? : State;  
+    private digDown? : State; 
+    private digSideways? : State; 
+    private blocking? : State; 
 
-    constructor(position: {x:number, y: number}){
+    constructor(id:string, position: {x:number, y: number}){
         super({x:position.x, y:position.y});
+        this.id = id;
 
         this.task = LemmingTask.IDLE;
         this.direction=Direction.RIGHT;
-        //this.direction=Direction.LEFT;
         this.animation = ANIMS.FALLING;
-
-        this.standingTile=undefined;
-        this.bumpTile=undefined;
 
         this.sprite = Context.physics.add.sprite(
             position.x,
@@ -50,13 +50,13 @@ export default class Lemming extends GameObject{
         );
 
         // for detecting if lemming is running into a wall
-        this.lemmingFrontSensor=Context.scene.add.rectangle(
-            0,0,LEMMING_SIZE.width/4,LEMMING_SIZE.height/4,0xffff00,0.5
-        ) as unknown as Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
-        Context.physics.add.existing(this.lemmingFrontSensor);
-        this.lemmingFrontSensor.body.allowGravity=false;
-
-        Context.physics.add.overlap(this.lemmingFrontSensor,Context.tileImageLayer,
+        this.lemmingFrontSensor=new SensorBox(
+            Context,
+            {x:0,y:0},
+            LEMMING_SIZE.width/4,
+            LEMMING_SIZE.height/4,
+            0xffff00,
+            0.5,
             (frontSensor,tile)=>{
                 if (tile !== this.bumpTile){
                     this.bumpTile = tile as Phaser.Tilemaps.Tile;
@@ -65,17 +65,17 @@ export default class Lemming extends GameObject{
             (frontSensor, tile)=>{
                 return (tile as  Phaser.Tilemaps.Tile).collides;
             },
-            this
         );
 
-        // for detecting if lemming is standing on ground
-        this.lemmingGroundSensor=Context.scene.add.rectangle(
-            0,0,1,1,0x00ffff,0.5
-        ) as unknown as Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
-        Context.physics.add.existing(this.lemmingGroundSensor);
-        this.lemmingGroundSensor.body.allowGravity=false;
 
-        Context.physics.add.overlap(this.lemmingGroundSensor,Context.tileImageLayer,
+        // for detecting if lemming is standing on ground
+        this.lemmingGroundSensor=new SensorBox(
+            Context,
+            {x:0,y:0},
+            LEMMING_SIZE.width/4,
+            LEMMING_SIZE.height/4,
+            0x00ffff,
+            0.5,
             (frontSensor,tile)=>{
                 if (tile !== this.standingTile){
                     this.standingTile = tile as Phaser.Tilemaps.Tile;
@@ -84,7 +84,6 @@ export default class Lemming extends GameObject{
             (frontSensor, tile)=>{
                 return (tile as  Phaser.Tilemaps.Tile).collides;
             },
-            this
         );
 
         // for stopping lemming from falling through ground
@@ -93,6 +92,14 @@ export default class Lemming extends GameObject{
 
         this.initStates();
         this.stateManager = new StateManager(this.falling!);
+
+        this.sprite.setInteractive().on(
+            Phaser.Input.Events.GAMEOBJECT_POINTER_UP,
+            ()=>{
+                console.log("selected lemming #" + this.id);
+                Context.selected = this;
+            }
+        )
     }
 
 
@@ -144,6 +151,20 @@ export default class Lemming extends GameObject{
 
     getSprite(){
         return this.sprite;
+    }
+
+    getTask(){
+        return this.task;
+    }
+
+    getState(){
+        return this.stateManager.getState();
+    }
+    
+    cancelTask(){
+        if (this.task===LemmingTask.IDLE) return;
+        if (this.stateManager.getState()!.name==LemmingStates.IDLE)
+            this.task = LemmingTask.IDLE;
     }
 
     private setSlopeMovement(slopeAngle:number){
@@ -279,7 +300,7 @@ export default class Lemming extends GameObject{
         return (
             (body.blocked.right||body.blocked.left)
             && this.task===LemmingTask.DIG_SIDEWAYS
-            && this.bumpTile
+            && this.bumpTile!=undefined
         );
     }
 
@@ -345,17 +366,18 @@ export default class Lemming extends GameObject{
 
 
     private updateFrontSensor(){
+        let x = this.sprite.x;
         if (this.direction===Direction.RIGHT)
-            this.lemmingFrontSensor.x=this.sprite.x+LEMMING_SIZE.width;
+            x+=LEMMING_SIZE.width;
         else if (this.direction===Direction.LEFT) 
-            this.lemmingFrontSensor.x=this.sprite.x-LEMMING_SIZE.width;
+            x-=LEMMING_SIZE.width;
         
-        this.lemmingFrontSensor.y=this.sprite.y;
+        if (x!== this.sprite.x)
+            this.lemmingFrontSensor.setPosition(x,this.sprite.y);
     }
 
     private updateGroundSensor(){
-        this.lemmingGroundSensor.x=this.sprite.x;
-        this.lemmingGroundSensor.y=this.sprite.y + LEMMING_SIZE.height;
+        this.lemmingGroundSensor.setPosition(this.sprite.x,this.sprite.y + LEMMING_SIZE.height);
     }
 
     update(){
