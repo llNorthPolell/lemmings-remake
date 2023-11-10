@@ -1,19 +1,19 @@
 import Phaser from "phaser";
 
 
-const canvasSize = {
+export const CANVAS_SIZE = {
     width:800,
     height:800,
 }
 
 //const gravity = 0.0981;
-const gravity = 200;
+export const gravity = 200;
 
-export const config = {
+export const config : Phaser.Types.Core.GameConfig= {
     type: Phaser.AUTO,
     scale: {
-        width:canvasSize.width,
-        height:canvasSize.height,
+        width:CANVAS_SIZE.width,
+        height:CANVAS_SIZE.height,
     },
     backgroundColor: 0x000000,
     physics: {
@@ -24,8 +24,8 @@ export const config = {
         default: 'arcade',
         arcade:{
             gravity: {y: gravity},
-            debug: true
+            //debug: true
         }
-    }
+    },
 }
 

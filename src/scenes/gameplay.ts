@@ -2,40 +2,26 @@ import { createLemmingAnimations } from "../animations/lemming";
 import { ASSETS } from "../scripts/enums/keys/assets";
 import { SCENES } from "../scripts/enums/keys/scenes";
 import Context from "../scripts/gameobjects/context";
+import Exit from "../scripts/gameobjects/exit";
 import { Position } from "../scripts/gameobjects/gameobject";
 import Lemming from "../scripts/gameobjects/lemming";
 import Spawner from "../scripts/gameobjects/spawner";
-import UIPanel from "../scripts/gameobjects/ui/ui";
 
 export default class GameplayScene extends Phaser.Scene{
     private tileImageLayer? : Phaser.Tilemaps.TilemapLayer;
-    private uiPanel : UIPanel|undefined;
     private lemmings:Lemming[];
-    private lemmingColliderGroup?:Phaser.Physics.Arcade.Group;
-    private start: Spawner|undefined;
-
-
-    private maxLemmings:number;
-    private lemmingsOut:number;
-    private lemmingsRequired:number;
-    private lemmingsDead: number;
-    private lemmingsSaved: number;
-
-    private selected?: Lemming;
+    private startDoor?: Spawner;
+    private exitDoor?: Exit;
 
     private dragStartX?:number;
     private dragX?:number;
 
     constructor(){
         super({
-            key: SCENES.GAMEPLAY
+            key: SCENES.GAMEPLAY,
+            active:true
         });
         this.lemmings=[];
-        this.maxLemmings=0;
-        this.lemmingsOut=0;
-        this.lemmingsRequired=0;
-        this.lemmingsDead=0;
-        this.lemmingsSaved=0;
     }
 
     preload(){
@@ -43,6 +29,7 @@ export default class GameplayScene extends Phaser.Scene{
         this.load.tilemapTiledJSON(ASSETS.TILE_MAP,"src/assets/levels/1.json");
 
         this.load.spritesheet(ASSETS.LEMMING_SPRITESHEET,"src/assets/sprites/lemming.png", {frameWidth:16,frameHeight:16});
+        this.load.spritesheet(ASSETS.DOOR_SPRITESHEET,"src/assets/sprites/door.png", {frameWidth:60,frameHeight:60});
     }
 
     private spawn(gameobject: string, position: Position){
@@ -52,9 +39,12 @@ export default class GameplayScene extends Phaser.Scene{
                 this.lemmings.push(lemming);
                 break;
             case "Entrance":
-                this.start = new Spawner(position);
+                this.startDoor = new Spawner(position);
                 break;
             case "Exit":
+                this.exitDoor = new Exit(position);
+                Context.exitDoor = this.exitDoor;
+                console.log("Exit set at " + JSON.stringify(this.exitDoor.getPosition()));
                 break;
             default:
                 break;
@@ -76,10 +66,10 @@ export default class GameplayScene extends Phaser.Scene{
             this.spawn(object.name,{x:object.x!, y:object.y!})
             
             if (object.name=="Entrance")
-                this.maxLemmings=object.properties![0].value;
+                Context.maxLemmings=object.properties![0].value;
                 //this.maxLemmings=1;
             else if (object.name=="Exit")
-                this.lemmingsRequired=object.properties![0].value;
+                Context.lemmingsRequired=object.properties![0].value;
         });
    
         (map.properties as Array<{name:string, type:string, value:number}>).forEach(
@@ -92,6 +82,10 @@ export default class GameplayScene extends Phaser.Scene{
                     Context.inventory.numBlocks=item.value;
                 else if (item.name=="numParachutes")
                     Context.inventory.numParachutes=item.value;
+                else if (item.name=="time"){
+                    Context.currentTime=item.value;
+                    Context.timeInSeconds=item.value;
+                }
            }
         );
         
@@ -99,18 +93,14 @@ export default class GameplayScene extends Phaser.Scene{
     }
     
     create(){
+        Context.scene = this;
+        Context.physics=this.physics;
+        Context.lemmingColliders=this.physics.add.group();
+
         this.cameras.main.setBounds(0,0,1600,0);
         createLemmingAnimations(this.anims);
 
         this.generateLevel();
-        
-        this.lemmingColliderGroup=this.physics.add.group();
-
-        Context.scene = this;
-        Context.physics=this.physics;
-        Context.lemmingColliders=this.lemmingColliderGroup;
-
-        this.uiPanel= new UIPanel(Context);
 
         this.input
         .on(
@@ -124,6 +114,8 @@ export default class GameplayScene extends Phaser.Scene{
             Phaser.Input.Events.GAMEOBJECT_POINTER_MOVE,
             ()=>{
                 if (this.game.input.activePointer.primaryDown){
+                    if (!this.dragStartX) this.dragStartX = 0;
+                    
                     this.dragX=this.game.input.activePointer.position.x;
                     this.cameras.main.scrollX+= (this.dragStartX!-this.dragX)/32;
                 }
@@ -140,12 +132,12 @@ export default class GameplayScene extends Phaser.Scene{
         )
 
         const spawnLemmings = setInterval(()=>{
-            if (this.lemmingsOut==this.maxLemmings){  
+            if (Context.lemmingsOut==Context.maxLemmings){  
                 clearInterval(spawnLemmings);
                 return;
             }
-            this.spawn("lemming", this.start!.getPosition());
-            this.lemmingsOut++;
+            this.spawn("lemming", this.startDoor!.getPosition());
+            Context.lemmingsOut++;
         },3000)
 
     }
@@ -154,6 +146,5 @@ export default class GameplayScene extends Phaser.Scene{
         this.lemmings.forEach(lemming=>{
             lemming.update();
         });
-        this.uiPanel!.updateProgressText(this.maxLemmings,this.lemmingsOut, this.lemmingsSaved);
     }
 }

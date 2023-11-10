@@ -1,5 +1,6 @@
-import { LemmingStates } from "../../enums/lemmingStates";
+import { CANVAS_SIZE } from "../../config";
 import { LemmingTask } from "../../enums/lemmingTasks";
+import Context from "../context";
 import Button from "./button";
 import Counter from "./counter";
 
@@ -28,21 +29,21 @@ export default class UIPanel {
 
     private selfDestructButton: Button;
 
-    constructor(context : any){
-        this.uiContainer = context.scene.add.container(0,600);
-        this.bg = context.scene.add.rectangle(0,0,800,200,UI_BG_COLOR).setOrigin(0,0);
+    constructor(hudScene: Phaser.Scene){
+        this.uiContainer = hudScene.add.container(0,600);
+        this.bg = hudScene.add.rectangle(0,0,CANVAS_SIZE.width,CANVAS_SIZE.height/4,UI_BG_COLOR).setOrigin(0,0);
         this.bg.depth=Infinity;
 
-        this.progressText = context.scene.add.text(
+        this.progressText = hudScene.add.text(
             400,
             0,
-            "Out: 0  In:0%");
+            "Out: 0  In: 0%  Required: 0");
 
 
         this.blockCounter = new Counter(
-            context,
+            hudScene,
             "BLOCK",
-            String(context.inventory.numBlocks),
+            String(Context.inventory.numBlocks),
             {x:10,y:40},
             100,
             20,
@@ -50,7 +51,7 @@ export default class UIPanel {
         );
 
         this.blockButton = new Button(
-            context,
+            hudScene,
             "BLOCK",
             "\n\n\n\n\nBLOCK",
             {x:10,y:60},
@@ -59,14 +60,12 @@ export default class UIPanel {
             UI_BTN_COLOR,
             ()=>{this.btnDownEffect(this.blockButton)},
             ()=>{
-                if (context.inventory.numBlocks==0) return;
-                const lemming = context.selected;
+                if (Context.inventory.numBlocks==0) return;
+                const lemming = Context.selected;
                 if (!lemming) return;
                 if (lemming.getTask()!==LemmingTask.IDLE) return;
                 lemming.assignBlock();
-                context.inventory.numBlocks--;
-                this.updateCounter(this.blockCounter,
-                    context.inventory.numBlocks);
+                Context.inventory.numBlocks--;
                 this.resetBtnEffect(this.blockButton);
             },
             ()=>{this.btnHoverEffect(this.blockButton)},
@@ -75,9 +74,9 @@ export default class UIPanel {
 
 
         this.digSidewaysCounter = new Counter(
-            context,
+            hudScene,
             "DIG_SDWY",
-            String(context.inventory.numDigSideways),
+            String(Context.inventory.numDigSideways),
             {x:120,y:40},
             100,
             20,
@@ -85,7 +84,7 @@ export default class UIPanel {
         );
 
         this.digSidewaysButton = new Button(
-            context,
+            hudScene,
             "DIG_SDWY",
             "\n\n\n\n\nDIG_SDWY",
             {x:120,y:60},
@@ -94,14 +93,12 @@ export default class UIPanel {
             UI_BTN_COLOR,
             ()=>{this.btnDownEffect(this.digSidewaysButton)},
             ()=>{
-                if (context.inventory.numDigSideways==0) return;
-                const lemming = context.selected;
+                if (Context.inventory.numDigSideways==0) return;
+                const lemming = Context.selected;
                 if (!lemming) return;
                 if (lemming.getTask()!==LemmingTask.IDLE) return;
                 lemming.assignDigSideways();
-                context.inventory.numDigSideways--;
-                this.updateCounter(this.digSidewaysCounter,
-                    context.inventory.numDigSideways);
+                Context.inventory.numDigSideways--;
                 this.resetBtnEffect(this.digSidewaysButton);
             },
             ()=>{this.btnHoverEffect(this.digSidewaysButton)},
@@ -109,9 +106,9 @@ export default class UIPanel {
         );
 
         this.digDownCounter = new Counter(
-            context,
+            hudScene,
             "DIG_DOWN",
-            String(context.inventory.numDigDowns),
+            String(Context.inventory.numDigDowns),
             {x:230,y:40},
             100,
             20,
@@ -119,7 +116,7 @@ export default class UIPanel {
         );
 
         this.digDownButton = new Button(
-            context,
+            hudScene,
             "DIG_DOWN",
             "\n\n\n\n\nDIG_DOWN",
             {x:230,y:60},
@@ -128,14 +125,12 @@ export default class UIPanel {
             UI_BTN_COLOR,
             ()=>{this.btnDownEffect(this.digDownButton)},
             ()=>{
-                if (context.inventory.numDigDowns==0) return;
-                const lemming = context.selected;
+                if (Context.inventory.numDigDowns==0) return;
+                const lemming = Context.selected;
                 if (!lemming) return;
                 if (lemming.getTask()!==LemmingTask.IDLE) return;
                 lemming.assignDigDown();
-                context.inventory.numDigDowns--;
-                this.updateCounter(this.digDownCounter,
-                    context.inventory.numDigDowns);
+                Context.inventory.numDigDowns--;
                 this.resetBtnEffect(this.digDownButton);
             },
             ()=>{this.btnHoverEffect(this.digDownButton)},
@@ -143,9 +138,9 @@ export default class UIPanel {
         );
 
         this.parachuteCounter = new Counter(
-            context,
+            hudScene,
             "PARACHUTE",
-            String(context.inventory.numParachutes),
+            String(Context.inventory.numParachutes),
             {x:340,y:40},
             100,
             20,
@@ -153,7 +148,7 @@ export default class UIPanel {
         );
         
         this.parachuteButton = new Button(
-            context,
+            hudScene,
             "PARACHUTE",
             "\n\n\n\n\nPARACHUTE",
             {x:340,y:60},
@@ -162,14 +157,12 @@ export default class UIPanel {
             UI_BTN_COLOR,
             ()=>{this.btnDownEffect(this.parachuteButton)},
             ()=>{
-                if (context.inventory.numParachutes==0) return;
-                const lemming = context.selected;
+                if (Context.inventory.numParachutes==0) return;
+                const lemming = Context.selected;
                 if (!lemming) return;
                 if (lemming.getTask()!==LemmingTask.IDLE) return;
                 console.log("SET PARACHUTE");
-                context.inventory.numParachutes--;
-                this.updateCounter(this.parachuteCounter,
-                    context.inventory.numParachutes);
+                Context.inventory.numParachutes--;
                 this.resetBtnEffect(this.parachuteButton);
             },
             ()=>{this.btnHoverEffect(this.parachuteButton)},
@@ -177,7 +170,7 @@ export default class UIPanel {
         );
 
         this.selfDestructButton = new Button(
-            context,
+            hudScene,
             "SELF_DESTRUCT",
             `\n\n\n\n\nSELF\nDESTRUCT`,
             {x:450,y:40},
@@ -206,7 +199,6 @@ export default class UIPanel {
         this.uiContainer.add(this.selfDestructButton);
 
         this.uiContainer.setScrollFactor(0);
-        //this.uiContainer.setDepth()
     }
 
     private resetBtnEffect= (btn:Button)=>{
@@ -221,10 +213,14 @@ export default class UIPanel {
         btn.bg.setFillStyle(UI_BTN_CLICK_COLOR);
     }
 
-    private updateCounter = (counter:Counter, value:number)=>{
-        counter.updateValue(value);
-    }
-    updateProgressText(maxLemmings:number, lemmingsOut:number,lemmingsSaved:number){
-        this.progressText.setText(`Out:${lemmingsOut} In:${lemmingsSaved/maxLemmings*100}%`)
+
+    update(){
+        this.blockCounter.updateValue(Context.inventory.numBlocks);
+        this.digSidewaysCounter.updateValue(Context.inventory.numDigSideways);
+        this.digDownCounter.updateValue(Context.inventory.numDigDowns);
+        this.parachuteCounter.updateValue(Context.inventory.numParachutes);
+        this.progressText.setText(`Out:${Context.lemmingsOut}  `+  
+            `In:${Context.lemmingsSaved/Context.lemmingsRequired*100}%  `+
+            `Required: ${Context.lemmingsRequired}`)
     }
 }

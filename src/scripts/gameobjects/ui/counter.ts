@@ -4,7 +4,7 @@ export default class Counter extends Phaser.GameObjects.Container {
     private display: Phaser.GameObjects.Text;
 
     constructor(
-        context: any, 
+        scene: Phaser.Scene, 
         name: string, 
         value: string,
         position: {x:number,y:number},
@@ -12,9 +12,9 @@ export default class Counter extends Phaser.GameObjects.Container {
         height: number,
         bgcolor: number){
     
-        super(context.scene,position.x,position.y);
+        super(scene,position.x,position.y);
         this.name=name;
-        this.bg = context.scene.add.rectangle(
+        this.bg = scene.add.rectangle(
             0,
             0,
             width,
@@ -22,7 +22,7 @@ export default class Counter extends Phaser.GameObjects.Container {
             bgcolor
         ).setOrigin(0);
 
-        this.display = context.scene.add.text(
+        this.display = scene.add.text(
             0,
             0,
             value

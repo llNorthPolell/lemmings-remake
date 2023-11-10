@@ -9,4 +9,6 @@ export const ASSETS = Object.freeze({
     // Lemmings
     LEMMING_SPRITESHEET: "lemming",
     
+    // Door
+    DOOR_SPRITESHEET: "door"
 })

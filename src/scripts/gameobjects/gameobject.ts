@@ -4,18 +4,20 @@ export interface Position{
 }
 
 export abstract class GameObject {
-    protected position : Position;
+    protected id: string;
+    protected sprite? : Phaser.Physics.Arcade.Sprite | Phaser.GameObjects.Sprite;
 
-    constructor(position : Position){
-        this.position = position;
+    constructor(id:string, sprite? : Phaser.Physics.Arcade.Sprite | Phaser.GameObjects.Sprite){
+        this.id=id;
+        this.sprite=sprite;
     }
 
-    setPosition (position : Position){
-        this.position = position;
+    getSprite(){
+        return this.sprite;
     }
 
-    getPosition () : Position{
-        return this.position;
+    getPosition(){
+        return {x:this.sprite!.x,y:this.sprite!.y}
     }
 }
 

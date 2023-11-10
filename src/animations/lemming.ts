@@ -36,4 +36,12 @@ export const createLemmingAnimations = (anims : Phaser.Animations.AnimationManag
         frames: anims.generateFrameNumbers(ASSETS.LEMMING_SPRITESHEET, {start:0, end:3}),
         repeat: -1
     });
+
+    anims.create({
+        key: ANIMS.EXIT,
+        frameRate: 4,
+        frames: anims.generateFrameNumbers(ASSETS.LEMMING_SPRITESHEET, {start:6, end:7}),
+        repeat: 3,
+        hideOnComplete: true
+    });
 }

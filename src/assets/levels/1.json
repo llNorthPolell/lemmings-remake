@@ -22,7 +22,7 @@
          "name":"objects",
          "objects":[
                 {
-                 "height":48,
+                 "height":24,
                  "id":6,
                  "name":"Entrance",
                  "properties":[
@@ -36,10 +36,10 @@
                  "visible":true,
                  "width":32,
                  "x":96,
-                 "y":24
+                 "y":49
                 }, 
                 {
-                 "height":48,
+                 "height":24,
                  "id":7,
                  "name":"Exit",
                  "properties":[
@@ -53,7 +53,7 @@
                  "visible":true,
                  "width":32,
                  "x":1440,
-                 "y":480
+                 "y":504
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -84,6 +84,11 @@
          "name":"numParachutes",
          "type":"int",
          "value":0
+        }, 
+        {
+         "name":"time",
+         "type":"int",
+         "value":300
         }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",

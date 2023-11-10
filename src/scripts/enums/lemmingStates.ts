@@ -3,6 +3,7 @@ export const LemmingStates = Object.freeze({
     FALLING: "falling",
     BLOCKING: "blocking",
     DIG_DOWN: "dig-down",
-    DIG_SIDEWAYS: "dig-sideways"
+    DIG_SIDEWAYS: "dig-sideways",
+    EXIT: "exit"
 })
 

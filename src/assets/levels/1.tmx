@@ -8,6 +8,7 @@
   <property name="numDigDowns" type="int" value="2"/>
   <property name="numDigSideways" type="int" value="0"/>
   <property name="numParachutes" type="int" value="0"/>
+  <property name="time" type="int" value="300"/>
  </properties>
  <tileset firstgid="1" name="tiles" tilewidth="32" tileheight="24" tilecount="64" columns="8">
   <grid orientation="orthogonal" width="50" height="25"/>
@@ -546,12 +547,12 @@
   </data>
  </layer>
  <objectgroup id="2" name="objects">
-  <object id="6" name="Entrance" x="96" y="24" width="32" height="48">
+  <object id="6" name="Entrance" x="96" y="49" width="32" height="24">
    <properties>
     <property name="maxLemmings" value="5"/>
    </properties>
   </object>
-  <object id="7" name="Exit" x="1440" y="480" width="32" height="48">
+  <object id="7" name="Exit" x="1440" y="504" width="32" height="24">
    <properties>
     <property name="lemmingsRequired" value="3"/>
    </properties>

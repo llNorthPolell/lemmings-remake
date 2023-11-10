@@ -15,7 +15,7 @@ export default class SensorBox {
             position.y,
             width,
             height,
-            debugColor,
+            (context.physics.world.debug)? debugColor:undefined,
             alpha
         ) as unknown as Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
         context.physics.add.existing(this.sensorBox);

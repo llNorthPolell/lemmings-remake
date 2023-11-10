@@ -13,10 +13,7 @@ const MOVESPEED = 25;
 const LEMMING_SIZE = {width:16, height:16};
 
 export default class Lemming extends GameObject{
-    private id: string;
-
     // lemming specific
-    private sprite : Phaser.Physics.Arcade.Sprite;
     private lemmingFrontSensor : SensorBox;
     private lemmingGroundSensor : SensorBox;
 
@@ -34,20 +31,18 @@ export default class Lemming extends GameObject{
     private digDown? : State; 
     private digSideways? : State; 
     private blocking? : State; 
+    private exit? : State;
 
     constructor(id:string, position: {x:number, y: number}){
-        super({x:position.x, y:position.y});
-        this.id = id;
+        super(id, Context.physics.add.sprite(
+            position.x,
+            position.y, 
+            ASSETS.LEMMING_SPRITESHEET
+        ));
 
         this.task = LemmingTask.IDLE;
         this.direction=Direction.RIGHT;
         this.animation = ANIMS.FALLING;
-
-        this.sprite = Context.physics.add.sprite(
-            position.x,
-            position.y, 
-            ASSETS.LEMMING_SPRITESHEET
-        );
 
         // for detecting if lemming is running into a wall
         this.lemmingFrontSensor=new SensorBox(
@@ -87,13 +82,13 @@ export default class Lemming extends GameObject{
         );
 
         // for stopping lemming from falling through ground
-        Context.physics.add.collider(this.sprite, Context.tileImageLayer); 
-        Context.lemmingColliders!.add(this.sprite);
+        Context.physics.add.collider(this.sprite!, Context.tileImageLayer); 
+        Context.lemmingColliders!.add(this.sprite!);
 
         this.initStates();
         this.stateManager = new StateManager(this.falling!);
 
-        this.sprite.setInteractive().on(
+        this.sprite!.setInteractive().on(
             Phaser.Input.Events.GAMEOBJECT_POINTER_UP,
             ()=>{
                 console.log("selected lemming #" + this.id);
@@ -128,9 +123,15 @@ export default class Lemming extends GameObject{
             onEnter: ()=>{this.doBlockingEnter()}
         }
 
+        this.exit = {
+            name: LemmingStates.EXIT,
+            entryCondition: ()=>{return this.canExit()},
+            onEnter: ()=>{return this.exitDoor()}
+        }
+
         this.idle = {
             name: LemmingStates.IDLE,
-            nextState: [this.falling,this.digDown, this.blocking, this.digSideways],
+            nextState: [this.falling,this.digDown, this.blocking, this.digSideways, this.exit],
             entryCondition: ()=>{return this.isTouchingGround()},
             onUpdate: ()=>{this.doIdle()}
         }
@@ -149,10 +150,6 @@ export default class Lemming extends GameObject{
         
     }
 
-    getSprite(){
-        return this.sprite;
-    }
-
     getTask(){
         return this.task;
     }
@@ -160,7 +157,7 @@ export default class Lemming extends GameObject{
     getState(){
         return this.stateManager.getState();
     }
-    
+
     cancelTask(){
         if (this.task===LemmingTask.IDLE) return;
         if (this.stateManager.getState()!.name==LemmingStates.IDLE)
@@ -168,19 +165,21 @@ export default class Lemming extends GameObject{
     }
 
     private setSlopeMovement(slopeAngle:number){
-        this.sprite.setRotation(slopeAngle);
-        this.sprite.setOffset(0,-10);
+        const sprite = this.sprite! as Phaser.Physics.Arcade.Sprite;
+        sprite.setRotation(slopeAngle);
+        sprite.setOffset(0,-10);
     }
 
     private updateVelocity(){
+        const sprite = this.sprite! as Phaser.Physics.Arcade.Sprite;
         const state = this.stateManager.getState();
         if (state===this.idle){
             if (this.direction===Direction.RIGHT)
-                this.sprite.setVelocityX(MOVESPEED);
+                sprite!.setVelocityX(MOVESPEED);
             else if (this.direction===Direction.LEFT)
-                this.sprite.setVelocityX(-MOVESPEED);
+                sprite!.setVelocityX(-MOVESPEED);
         }
-        else this.sprite.setVelocityX(0);      
+        else sprite!.setVelocityX(0);      
     }
 
     private updateAnimation(){
@@ -201,18 +200,21 @@ export default class Lemming extends GameObject{
             animation=ANIMS.FALLING;
         else if (state===this.digDown)
             animation=ANIMS.DIG_DOWN;
-        else if (state===this.blocking){
+        else if (state===this.blocking)
             animation=ANIMS.BLOCKING;
-        }
+        else if (state===this.exit)
+            animation=ANIMS.EXIT;
+        
 
         if (this.animation !== animation){
             this.animation = animation;
-            this.sprite.play(this.animation);
+            this.sprite!.play(this.animation);
         }
     }
 
     private isTouchingGround(){
-        return this.sprite.body!.blocked.down;
+        const body = this.sprite!.body! as Phaser.Physics.Arcade.StaticBody;
+        return body.blocked.down;
     }
 
     private doIdle(){
@@ -221,7 +223,7 @@ export default class Lemming extends GameObject{
             return;
         }
 
-        const body = this.sprite.body!;
+        const body = this.sprite!.body! as Phaser.Physics.Arcade.StaticBody;
         if (this.task !== LemmingTask.DIG_SIDEWAYS){
             if ((body.blocked.left && this.direction===Direction.LEFT) || 
                 (body.blocked.right && this.direction===Direction.RIGHT)){
@@ -277,10 +279,13 @@ export default class Lemming extends GameObject{
             default:
                 break;
         }   
+
+        if (this.canExit())
+            this.stateManager.tryNext(LemmingStates.EXIT);
     }
 
     private doFalling(){
-        const body = this.sprite.body!;
+        const body = this.sprite!.body! as Phaser.Physics.Arcade.StaticBody;
         if (body.offset.y !=0)
             body.setOffset(0,0);
 
@@ -296,7 +301,7 @@ export default class Lemming extends GameObject{
     }
 
     canDigSideways(){
-        const body = this.sprite.body!;
+        const body = this.sprite!.body! as Phaser.Physics.Arcade.StaticBody;
         return (
             (body.blocked.right||body.blocked.left)
             && this.task===LemmingTask.DIG_SIDEWAYS
@@ -305,7 +310,7 @@ export default class Lemming extends GameObject{
     }
 
     private doDigSideways() {
-        const body = this.sprite.body!;
+        const body = this.sprite!.body! as Phaser.Physics.Arcade.StaticBody;
         if ((body.blocked.right && this.direction===Direction.RIGHT) || 
             (body.blocked.left && this.direction===Direction.LEFT))
             setTimeout(() => {
@@ -332,9 +337,9 @@ export default class Lemming extends GameObject{
     }
 
     private doBlockingEnter(){
-        console.log("Blocking");
-        this.sprite.body!.immovable=true;
-        Context.physics.add.collider(this.sprite,Context.lemmingColliders);
+        const body = this.sprite!.body! as Phaser.Physics.Arcade.StaticBody;
+        body.immovable=true;
+        Context.physics.add.collider(this.sprite!,Context.lemmingColliders);
 
     }
 
@@ -347,7 +352,7 @@ export default class Lemming extends GameObject{
     }
 
     private doDigDown(){
-        const body = this.sprite.body!;
+        const body = this.sprite!.body! as Phaser.Physics.Arcade.StaticBody;
         const tileToRemoveX = Math.floor(body.x/32);
         const tileToRemoveY = Math.floor(body.y/24)+1;
         body.position.x = (tileToRemoveX*32)+8;    // center lemming on tile to dig
@@ -366,18 +371,38 @@ export default class Lemming extends GameObject{
 
 
     private updateFrontSensor(){
-        let x = this.sprite.x;
+        let x = this.sprite!.x;
         if (this.direction===Direction.RIGHT)
             x+=LEMMING_SIZE.width;
         else if (this.direction===Direction.LEFT) 
             x-=LEMMING_SIZE.width;
         
-        if (x!== this.sprite.x)
-            this.lemmingFrontSensor.setPosition(x,this.sprite.y);
+        if (x!== this.sprite!.x)
+            this.lemmingFrontSensor.setPosition(x,this.sprite!.y);
     }
 
     private updateGroundSensor(){
-        this.lemmingGroundSensor.setPosition(this.sprite.x,this.sprite.y + LEMMING_SIZE.height);
+        this.lemmingGroundSensor.setPosition(this.sprite!.x,this.sprite!.y + LEMMING_SIZE.height);
+    }
+
+    private canExit(){
+        const body = this.sprite!.body! as Phaser.Physics.Arcade.StaticBody;
+        const exitDoor = Context.exitDoor.getSprite()!;
+        return body.x >= exitDoor.x - 8
+            && body.x <= exitDoor.x - 4
+            && body.y >= exitDoor.y
+            && body.y <= exitDoor.y + 24;
+    }
+
+    private exitDoor(){
+        Context.lemmingsSaved++;
+        const sprite = this.sprite!;
+        sprite.once(
+            'animationcomplete',
+            ()=>{
+                Context.lemmingColliders.remove(sprite);
+            }
+        )
     }
 
     update(){

@@ -1,3 +1,4 @@
+import Exit from "./exit";
 import Lemming from "./lemming";
 
 export default class Context{
@@ -6,11 +7,11 @@ export default class Context{
     static lemmingColliders: Phaser.Physics.Arcade.Group;
     static scene: Phaser.Scene;
 
-    static maxLemmings:number;
-    static lemmingsOut:number;
-    static lemmingsRequired:number;
-    static lemmingsDead: number;
-    static lemmingsSaved: number;
+    static maxLemmings:number=0;
+    static lemmingsOut:number=0;
+    static lemmingsRequired:number=0;
+    static lemmingsDead: number=0;
+    static lemmingsSaved: number=0;
 
     static inventory= {
         numDigDowns:0,
@@ -20,5 +21,10 @@ export default class Context{
     };
 
     static selected?: Lemming;
+
+    static exitDoor: Exit;
+
+    static currentTime:number = 0;
+    static timeInSeconds:number = 0;
 
 }

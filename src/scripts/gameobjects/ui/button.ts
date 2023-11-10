@@ -4,7 +4,7 @@ export default class Button extends Phaser.GameObjects.Container {
     display: Phaser.GameObjects.Text;
 
     constructor(
-        context: any, 
+        scene:Phaser.Scene, 
         name: string, 
         display: string,
         position: {x:number,y:number},
@@ -16,9 +16,9 @@ export default class Button extends Phaser.GameObjects.Container {
         onPointerHover?: ()=>void,
         onPointerExit? : ()=>void){
     
-        super(context.scene,position.x,position.y);
+        super(scene,position.x,position.y);
         this.name=name;
-        this.bg = context.scene.add.rectangle(
+        this.bg = scene.add.rectangle(
             0,
             0,
             width,
@@ -26,7 +26,7 @@ export default class Button extends Phaser.GameObjects.Container {
             bgcolor
         ).setOrigin(0);
 
-        this.display = context.scene.add.text(
+        this.display = scene.add.text(
             0,
             0,
             display
