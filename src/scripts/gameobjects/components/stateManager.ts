@@ -48,7 +48,6 @@ export default class StateManager {
             nextState = this.state?.nextState;
 
         if (!nextState?.entryCondition()) return;
-        console.log("State Change");
         this.prevState = this.state;
         
         if (this.state?.onExit)

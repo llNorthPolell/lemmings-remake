@@ -179,7 +179,10 @@ export default class UIPanel {
             UI_BTN_COLOR,
             ()=>{this.btnDownEffect(this.selfDestructButton)},
             ()=>{
-                console.log("SET SELF_DESTRUCT");
+                const lemming = Context.selected;
+                if (!lemming) return;
+                if (lemming.getTask()!==LemmingTask.IDLE && lemming.getTask()!==LemmingTask.BLOCK) return;
+                lemming.assignSelfDestruct();
                 this.resetBtnEffect(this.selfDestructButton);
             },
             ()=>{this.btnHoverEffect(this.selfDestructButton)},
@@ -219,8 +222,11 @@ export default class UIPanel {
         this.digSidewaysCounter.updateValue(Context.inventory.numDigSideways);
         this.digDownCounter.updateValue(Context.inventory.numDigDowns);
         this.parachuteCounter.updateValue(Context.inventory.numParachutes);
+
+        const progress = Math.round(Context.lemmingsSaved/Context.lemmingsRequired*100);
+        
         this.progressText.setText(`Out:${Context.lemmingsOut}  `+  
-            `In:${Context.lemmingsSaved/Context.lemmingsRequired*100}%  `+
+            `In:${(progress>100)?100: progress}%  `+
             `Required: ${Context.lemmingsRequired}`)
     }
 }

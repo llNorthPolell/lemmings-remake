@@ -5,6 +5,7 @@ import Context from "../scripts/gameobjects/context";
 import Exit from "../scripts/gameobjects/exit";
 import { Position } from "../scripts/gameobjects/gameobject";
 import Lemming from "../scripts/gameobjects/lemming";
+import SelectionBox from "../scripts/gameobjects/selectionBox";
 import Spawner from "../scripts/gameobjects/spawner";
 
 export default class GameplayScene extends Phaser.Scene{
@@ -16,12 +17,20 @@ export default class GameplayScene extends Phaser.Scene{
     private dragStartX?:number;
     private dragX?:number;
 
+    private selectionBox?: SelectionBox;
+
+    private gameOver: boolean;
+    private win: boolean;
+
+
     constructor(){
         super({
             key: SCENES.GAMEPLAY,
             active:true
         });
         this.lemmings=[];
+        this.gameOver=false;
+        this.win = false;
     }
 
     preload(){
@@ -96,6 +105,7 @@ export default class GameplayScene extends Phaser.Scene{
         Context.scene = this;
         Context.physics=this.physics;
         Context.lemmingColliders=this.physics.add.group();
+        Context.lemmingsDead=0;
 
         this.cameras.main.setBounds(0,0,1600,0);
         createLemmingAnimations(this.anims);
@@ -131,20 +141,46 @@ export default class GameplayScene extends Phaser.Scene{
             }
         )
 
-        const spawnLemmings = setInterval(()=>{
-            if (Context.lemmingsOut==Context.maxLemmings){  
-                clearInterval(spawnLemmings);
-                return;
-            }
-            this.spawn("lemming", this.startDoor!.getPosition());
-            Context.lemmingsOut++;
-        },3000)
 
+        const spawnLemmings = this.time.addEvent({ 
+            delay: 3000, callback: ()=>{
+                this.spawn("lemming", this.startDoor!.getPosition());
+                Context.lemmingsOut++;
+                if (Context.lemmingsOut == Context.maxLemmings)
+                    this.time.removeEvent(spawnLemmings);
+            }, 
+            callbackScope: this,
+            loop:true
+        });
+ 
+        this.selectionBox = new SelectionBox({x:0,y:0});
+
+        /*setTimeout(()=>{
+            this.game.pause();
+            console.log("Game paused");
+        },5000);
+
+        setTimeout(()=>{
+            this.game.resume();
+            console.log("Game resumed");
+        },15000);*/
     }
 
     update(){
         this.lemmings.forEach(lemming=>{
             lemming.update();
         });
+        this.selectionBox!.update();
+
+        if (this.gameOver) return;
+        if (Context.lemmingsDead+Context.lemmingsSaved==Context.maxLemmings){
+            this.gameOver=true;
+            if(Context.lemmingsSaved>=Context.lemmingsRequired){
+                console.log("You win!");
+                this.win=true;
+            }
+            else 
+                console.log("Mission Failed...");
+        }
     }
 }

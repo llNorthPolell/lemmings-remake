@@ -44,4 +44,20 @@ export const createLemmingAnimations = (anims : Phaser.Animations.AnimationManag
         repeat: 3,
         hideOnComplete: true
     });
+
+    anims.create({
+        key: ANIMS.FALL_DEAD,
+        frameRate: 4,
+        frames: anims.generateFrameNumbers(ASSETS.LEMMING_SPRITESHEET, {start:16, end:19}),
+        repeat: 0,
+        hideOnComplete: true
+    });
+    
+    anims.create({
+        key: ANIMS.SELF_DESTRUCT,
+        frameRate: 4,
+        frames: anims.generateFrameNumbers(ASSETS.LEMMING_SPRITESHEET, {start:20, end:27}),
+        repeat: 0,
+        hideOnComplete: true
+    });
 }
