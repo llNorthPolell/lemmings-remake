@@ -35,7 +35,7 @@ export default class GameplayScene extends Phaser.Scene{
 
     preload(){
         this.load.image(ASSETS.TILE_SET, "src/assets/tilesets/tiles.png")
-        this.load.tilemapTiledJSON(ASSETS.TILE_MAP,"src/assets/levels/1.json");
+        this.load.tilemapTiledJSON(ASSETS.TILE_MAP,`src/assets/levels/${Context.level}.json`);
 
         this.load.spritesheet(ASSETS.LEMMING_SPRITESHEET,"src/assets/sprites/lemming.png", {frameWidth:16,frameHeight:16});
         this.load.spritesheet(ASSETS.DOOR_SPRITESHEET,"src/assets/sprites/door.png", {frameWidth:60,frameHeight:60});
@@ -101,11 +101,14 @@ export default class GameplayScene extends Phaser.Scene{
         Context.tileImageLayer=this.tileImageLayer;
     }
     
-    create(){
+    create(){   
         Context.scene = this;
         Context.physics=this.physics;
         Context.lemmingColliders=this.physics.add.group();
+        Context.lemmingsOut=0;
         Context.lemmingsDead=0;
+        Context.lemmingsSaved=0;
+        Context.selected=undefined;
 
         this.cameras.main.setBounds(0,0,1600,0);
         createLemmingAnimations(this.anims);
@@ -116,6 +119,7 @@ export default class GameplayScene extends Phaser.Scene{
         .on(
             Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN,
             ()=>{
+                if(Context.paused) return;
                 if (!this.dragStartX)
                     this.dragStartX = this.game.input.activePointer.downX;        
             }
@@ -123,6 +127,7 @@ export default class GameplayScene extends Phaser.Scene{
         .on(
             Phaser.Input.Events.GAMEOBJECT_POINTER_MOVE,
             ()=>{
+                if(Context.paused) return;
                 if (this.game.input.activePointer.primaryDown){
                     if (!this.dragStartX) this.dragStartX = 0;
                     
@@ -134,6 +139,7 @@ export default class GameplayScene extends Phaser.Scene{
         .on(
             Phaser.Input.Events.GAMEOBJECT_POINTER_UP,
             ()=>{
+                if(Context.paused) return;
                 if (this.dragStartX){
                     this.dragStartX = undefined;
                     this.dragX=undefined;
@@ -154,19 +160,20 @@ export default class GameplayScene extends Phaser.Scene{
         });
  
         this.selectionBox = new SelectionBox({x:0,y:0});
-
-        /*setTimeout(()=>{
-            this.game.pause();
-            console.log("Game paused");
-        },5000);
-
-        setTimeout(()=>{
-            this.game.resume();
-            console.log("Game resumed");
-        },15000);*/
     }
 
     update(){
+        if (Context.restart){
+            this.lemmings.forEach(lemming=>{
+                lemming.destroy();
+            });
+            Context.restart=false;
+            this.scene.restart();
+            this.create();
+            return;
+        }
+
+
         this.lemmings.forEach(lemming=>{
             lemming.update();
         });

@@ -54,5 +54,7 @@ export default class Button extends Phaser.GameObjects.Container {
                 ()=>{if(onPointerExit)onPointerExit()}
             );
         
+        this.setScrollFactor(0);
+        this.setDepth(Infinity);
     }
 }

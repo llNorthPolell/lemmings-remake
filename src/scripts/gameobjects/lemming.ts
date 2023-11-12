@@ -492,7 +492,16 @@ export default class Lemming extends GameObject{
             Context.selected=undefined;
     }
 
+    destroy(){
+        this.sprite!.destroy();
+        this.lemmingFrontSensor.destroy();
+        this.lemmingGroundSensor.destroy();
+        this.stateManager.destroy();
+        this.active=false;
+    }
+
     update(){
+        if(!this.active) return;
         this.stateManager.update();
         this.updateAnimation();
         this.updateVelocity();

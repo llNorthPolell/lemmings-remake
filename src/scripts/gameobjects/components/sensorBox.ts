@@ -40,4 +40,8 @@ export default class SensorBox {
     update(){
         
     }
+
+    destroy(){
+        this.sensorBox.destroy();
+    }
 }

@@ -6,6 +6,7 @@ export interface Position{
 export abstract class GameObject {
     protected id: string;
     protected sprite? : Phaser.Physics.Arcade.Sprite | Phaser.GameObjects.Sprite;
+    protected active = true;
 
     constructor(id:string, sprite? : Phaser.Physics.Arcade.Sprite | Phaser.GameObjects.Sprite){
         this.id=id;
@@ -18,6 +19,10 @@ export abstract class GameObject {
 
     getPosition(){
         return {x:this.sprite!.x,y:this.sprite!.y}
+    }
+
+    isActive(){
+        return this.active;
     }
 }
 

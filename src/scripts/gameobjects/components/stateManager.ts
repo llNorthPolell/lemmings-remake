@@ -68,4 +68,9 @@ export default class StateManager {
         if (this.state?.onUpdate)
             this.state.onUpdate();
     }
+
+    destroy(){
+        this.state=undefined;
+        this.prevState=undefined;
+    }
 }

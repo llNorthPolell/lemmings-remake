@@ -1,17 +1,12 @@
 import { CANVAS_SIZE } from "../../config";
+import { UI_BG_COLOR, UI_BTN_CLICK_COLOR, UI_BTN_COLOR, UI_BTN_HOVER_COLOR, UI_COUNTER_COLOR } from "../../constants";
 import { LemmingTask } from "../../enums/lemmingTasks";
 import Context from "../context";
 import Button from "./button";
 import Counter from "./counter";
 
-const UI_BG_COLOR=0x004455;
-const UI_BTN_COLOR=0x002233;
-const UI_BTN_CLICK_COLOR=0x001122;
-const UI_BTN_HOVER_COLOR=0x007788;
-const UI_COUNTER_COLOR=0x001122;
-
-export default class UIPanel {
-    private uiContainer : Phaser.GameObjects.Container;
+export default class HUDPanel {
+    private hudContainer : Phaser.GameObjects.Container;
     private bg : Phaser.GameObjects.Rectangle;
     private progressText: Phaser.GameObjects.Text;
 
@@ -30,7 +25,7 @@ export default class UIPanel {
     private selfDestructButton: Button;
 
     constructor(hudScene: Phaser.Scene){
-        this.uiContainer = hudScene.add.container(0,600);
+        this.hudContainer = hudScene.add.container(0,600);
         this.bg = hudScene.add.rectangle(0,0,CANVAS_SIZE.width,CANVAS_SIZE.height/4,UI_BG_COLOR).setOrigin(0,0);
         this.bg.depth=Infinity;
 
@@ -189,19 +184,19 @@ export default class UIPanel {
             ()=>{this.resetBtnEffect(this.selfDestructButton)}
         );
 
-        this.uiContainer.add(this.bg);
-        this.uiContainer.add(this.progressText);
-        this.uiContainer.add(this.blockCounter);
-        this.uiContainer.add(this.blockButton);
-        this.uiContainer.add(this.digSidewaysCounter);
-        this.uiContainer.add(this.digSidewaysButton);
-        this.uiContainer.add(this.digDownCounter);
-        this.uiContainer.add(this.digDownButton);
-        this.uiContainer.add(this.parachuteCounter);
-        this.uiContainer.add(this.parachuteButton);
-        this.uiContainer.add(this.selfDestructButton);
+        this.hudContainer.add(this.bg);
+        this.hudContainer.add(this.progressText);
+        this.hudContainer.add(this.blockCounter);
+        this.hudContainer.add(this.blockButton);
+        this.hudContainer.add(this.digSidewaysCounter);
+        this.hudContainer.add(this.digSidewaysButton);
+        this.hudContainer.add(this.digDownCounter);
+        this.hudContainer.add(this.digDownButton);
+        this.hudContainer.add(this.parachuteCounter);
+        this.hudContainer.add(this.parachuteButton);
+        this.hudContainer.add(this.selfDestructButton);
 
-        this.uiContainer.setScrollFactor(0);
+        this.hudContainer.setScrollFactor(0);
     }
 
     private resetBtnEffect= (btn:Button)=>{

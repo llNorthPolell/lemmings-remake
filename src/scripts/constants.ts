@@ -1,0 +1,5 @@
+export const UI_BG_COLOR=0x004455;
+export const UI_BTN_COLOR=0x002233;
+export const UI_BTN_CLICK_COLOR=0x001122;
+export const UI_BTN_HOVER_COLOR=0x007788;
+export const UI_COUNTER_COLOR=0x001122;
