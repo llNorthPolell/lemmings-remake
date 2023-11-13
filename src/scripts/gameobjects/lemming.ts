@@ -59,12 +59,12 @@ export default class Lemming extends GameObject{
             LEMMING_SIZE.height/4,
             0xffff00,
             0.5,
-            (frontSensor,tile)=>{
+            (_frontSensor,tile)=>{
                 if (tile !== this.bumpTile){
                     this.bumpTile = tile as Phaser.Tilemaps.Tile;
                 }
             },
-            (frontSensor, tile)=>{
+            (_frontSensor, tile)=>{
                 return (tile as  Phaser.Tilemaps.Tile).collides;
             },
         );
@@ -78,12 +78,12 @@ export default class Lemming extends GameObject{
             LEMMING_SIZE.height/4,
             0x00ffff,
             0.5,
-            (frontSensor,tile)=>{
+            (_frontSensor,tile)=>{
                 if (tile !== this.standingTile){
                     this.standingTile = tile as Phaser.Tilemaps.Tile;
                 }
             },
-            (frontSensor, tile)=>{
+            (_frontSensor, tile)=>{
                 return (tile as  Phaser.Tilemaps.Tile).collides;
             },
         );
