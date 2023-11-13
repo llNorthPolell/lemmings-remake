@@ -35,11 +35,10 @@ export default class Button extends Phaser.GameObjects.Container {
         this.add(this.bg);
         this.add(this.display);
 
-        this.setInteractive(new Phaser.Geom.Rectangle(0,0,width,height),Phaser.Geom.Rectangle.Contains)
+        this.setInteractive(this.bg,Phaser.Geom.Rectangle.Contains)
             .on(
                 Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN,
                 ()=>{if(onPointerDown)onPointerDown()}
-                
             )
             .on(
                 Phaser.Input.Events.GAMEOBJECT_POINTER_UP,

@@ -156,7 +156,7 @@ export default class HUDPanel {
                 const lemming = Context.selected;
                 if (!lemming) return;
                 if (lemming.getTask()!==LemmingTask.IDLE) return;
-                console.log("SET PARACHUTE");
+                lemming.assignParachute();
                 Context.inventory.numParachutes--;
                 this.resetBtnEffect(this.parachuteButton);
             },

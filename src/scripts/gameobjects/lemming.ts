@@ -33,6 +33,7 @@ export default class Lemming extends GameObject{
     private digDown? : State; 
     private digSideways? : State; 
     private blocking? : State; 
+    private parachute? : State;
     private selfDestruct? : State;
     private exit? : State;
     private fallDead? : State;
@@ -91,6 +92,10 @@ export default class Lemming extends GameObject{
         Context.physics.add.collider(this.sprite!, Context.tileImageLayer); 
         Context.lemmingColliders!.add(this.sprite!);
 
+        // when adding to a physics group, world bound colliders are set to false automatically for some reason
+        (this.sprite!.body! as Phaser.Physics.Arcade.Body).onWorldBounds = true;
+        (this.sprite!.body! as Phaser.Physics.Arcade.Body).setCollideWorldBounds(true);
+
         this.initStates();
         this.stateManager = new StateManager(this.falling!);
 
@@ -100,7 +105,21 @@ export default class Lemming extends GameObject{
                 console.log("selected lemming #" + this.id);
                 Context.selected = this;
             }
+        );
+
+     
+
+        Context.physics.world.on(
+            "worldbounds",
+            (body: Phaser.Physics.Arcade.Body)=>{
+                if (body==this.sprite!.body!){
+                    this.killLemming();
+                    (this.sprite!.body! as Phaser.Physics.Arcade.Body).onWorldBounds = false;
+                    (this.sprite!.body! as Phaser.Physics.Arcade.Body).setCollideWorldBounds(false);
+                }
+            }
         )
+
     }
 
 
@@ -127,6 +146,14 @@ export default class Lemming extends GameObject{
             name:LemmingStates.BLOCKING,
             entryCondition: ()=>{return this.canBlock()},
             onEnter: ()=>{this.doBlockingEnter()}
+        }
+
+        this.parachute = {
+            name:LemmingStates.PARACHUTE,
+            entryCondition: ()=>{return this.canParachute()},
+            onEnter: ()=>{this.deployParachute()},
+            onUpdate: ()=>{this.doParachute()},
+            onExit: ()=>{this.exitParachute()}
         }
 
         this.exit = {
@@ -157,13 +184,14 @@ export default class Lemming extends GameObject{
         this.fallDead = {
             name:LemmingStates.FALL_DEAD,
             entryCondition: ()=>{return this.isDeadOnImpact},
-            onEnter: ()=>{this.killLemming()}
+            onEnter: ()=>{this.doFallKill()}
         }
 
-        this.falling.nextState=[this.idle,this.fallDead, this.selfDestruct];
+        this.falling.nextState=[this.idle,this.fallDead, this.selfDestruct, this.parachute];
         this.digDown.nextState=[this.falling];
         this.digSideways.nextState=[this.idle,this.falling];
         this.blocking.nextState=[this.falling, this.selfDestruct];
+        this.parachute.nextState=[this.idle,this.selfDestruct];
     }
 
     private turnAround(){
@@ -232,6 +260,8 @@ export default class Lemming extends GameObject{
             animation=ANIMS.FALL_DEAD;
         else if (state===this.selfDestruct)
             animation=ANIMS.SELF_DESTRUCT;
+        else if (state===this.parachute)
+            animation=ANIMS.PARACHUTE;
         
 
         if (this.animation !== animation){
@@ -317,7 +347,8 @@ export default class Lemming extends GameObject{
         if (body.offset.y !=0)
             body.setOffset(0,0);
         
-
+        if (this.task===LemmingTask.PARACHUTE)
+            this.stateManager.tryNext(LemmingStates.PARACHUTE);
 
         if (this.isTouchingGround() && this.standingTile){
             if(this.isDeadOnImpact)
@@ -410,6 +441,41 @@ export default class Lemming extends GameObject{
         });
     }
 
+    assignParachute(){
+        this.task=LemmingTask.PARACHUTE;
+    }
+
+    canParachute(){
+        return this.stateManager.getState()!.name==LemmingStates.FALLING 
+            && this.task===LemmingTask.PARACHUTE;
+    }
+
+    deployParachute(){
+        const body = this.sprite!.body as Phaser.Physics.Arcade.Body;
+        body.allowGravity=false;
+        body.setVelocityY(25);
+
+        if (!this.isTouchingGround() 
+            && !this.standingTile 
+            && this.isDeadOnImpact)
+            this.isDeadOnImpact=false;    
+    }
+
+    doParachute(){
+        if (this.isTouchingGround() && this.standingTile)
+            this.stateManager.tryNext(LemmingStates.IDLE);
+        
+    }
+
+    exitParachute(){
+        const body = this.sprite!.body as Phaser.Physics.Arcade.Body;
+        body.allowGravity=true;
+        body.setVelocityY(0);
+       
+        if (this.task===LemmingTask.PARACHUTE)
+            this.task=LemmingTask.IDLE;
+    }
+
     assignSelfDestruct(){
         this.task=LemmingTask.SELF_DESTRUCT;
         Context.scene.time.addEvent({ 
@@ -441,9 +507,18 @@ export default class Lemming extends GameObject{
                     Context.tileImageLayer.removeTileAt(currentTileX-1,currentTileY);
                 if (rightTile)
                     Context.tileImageLayer.removeTileAt(currentTileX+1,currentTileY);
+                this.killLemming();
             }
         )
-        this.killLemming();
+    }
+
+    private doFallKill(){
+        this.sprite!.once(
+            "animationcomplete",
+            ()=>{
+                this.killLemming();
+            }
+        );
     }
 
 
@@ -485,6 +560,7 @@ export default class Lemming extends GameObject{
     }
 
     private killLemming(){
+        console.log("Casualty...");
         const sprite = this.sprite!;
         Context.lemmingColliders.remove(sprite);
         Context.lemmingsDead++;

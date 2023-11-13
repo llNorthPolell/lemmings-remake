@@ -38,8 +38,7 @@ export default class HUD extends Phaser.Scene{
                 this.game.scene.pause(SCENES.GAMEPLAY);
         
                 const pauseMenu = this.scene.get(SCENES.PAUSE_MENU).scene;
-                pauseMenu.setActive(true);
-                pauseMenu.setVisible(true);
+                pauseMenu.wake();
 
                 this.scene.pause();
             },

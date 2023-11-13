@@ -1,4 +1,5 @@
 import { createLemmingAnimations } from "../animations/lemming";
+import { CANVAS_SIZE } from "../scripts/config";
 import { ASSETS } from "../scripts/enums/keys/assets";
 import { SCENES } from "../scripts/enums/keys/scenes";
 import Context from "../scripts/gameobjects/context";
@@ -18,10 +19,7 @@ export default class GameplayScene extends Phaser.Scene{
     private dragX?:number;
 
     private selectionBox?: SelectionBox;
-
-    private gameOver: boolean;
-    private win: boolean;
-
+    private gameOver:boolean;
 
     constructor(){
         super({
@@ -30,7 +28,12 @@ export default class GameplayScene extends Phaser.Scene{
         });
         this.lemmings=[];
         this.gameOver=false;
-        this.win = false;
+    }
+
+    init(data:any){
+        const level = data.level;
+        if (level) console.log("Got level: "+ level);
+        Context.level = level? level:1;
     }
 
     preload(){
@@ -38,6 +41,7 @@ export default class GameplayScene extends Phaser.Scene{
         this.load.tilemapTiledJSON(ASSETS.TILE_MAP,`src/assets/levels/${Context.level}.json`);
 
         this.load.spritesheet(ASSETS.LEMMING_SPRITESHEET,"src/assets/sprites/lemming.png", {frameWidth:16,frameHeight:16});
+        this.load.spritesheet(ASSETS.LEMMING_PARACHUTE_SPRITESHEET,"src/assets/sprites/lemming_parachute.png", {frameWidth:16,frameHeight:32});
         this.load.spritesheet(ASSETS.DOOR_SPRITESHEET,"src/assets/sprites/door.png", {frameWidth:60,frameHeight:60});
     }
 
@@ -99,6 +103,9 @@ export default class GameplayScene extends Phaser.Scene{
         );
         
         Context.tileImageLayer=this.tileImageLayer;
+
+        this.physics.world.setBounds(0,0,1600,CANVAS_SIZE.height,true,true,true,true);
+
     }
     
     create(){   
@@ -109,6 +116,7 @@ export default class GameplayScene extends Phaser.Scene{
         Context.lemmingsDead=0;
         Context.lemmingsSaved=0;
         Context.selected=undefined;
+        this.gameOver=false;
 
         this.cameras.main.setBounds(0,0,1600,0);
         createLemmingAnimations(this.anims);
@@ -160,6 +168,7 @@ export default class GameplayScene extends Phaser.Scene{
         });
  
         this.selectionBox = new SelectionBox({x:0,y:0});
+        this.gameOver=false;
     }
 
     update(){
@@ -181,13 +190,22 @@ export default class GameplayScene extends Phaser.Scene{
 
         if (this.gameOver) return;
         if (Context.lemmingsDead+Context.lemmingsSaved==Context.maxLemmings){
-            this.gameOver=true;
             if(Context.lemmingsSaved>=Context.lemmingsRequired){
                 console.log("You win!");
-                this.win=true;
+                this.scene.pause();
+                Context.paused=true;
+                const winMenu = this.scene.get(SCENES.WIN_MENU).scene;
+                winMenu.wake();
             }
-            else 
+            else {
                 console.log("Mission Failed...");
+                this.scene.pause();
+                Context.paused=true;
+                const lossMenu = this.scene.get(SCENES.LOSS_MENU).scene;
+                lossMenu.wake();
+            }
+            this.gameOver=true;
         }
+        
     }
 }

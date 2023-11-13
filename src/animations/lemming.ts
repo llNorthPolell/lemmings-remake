@@ -60,4 +60,11 @@ export const createLemmingAnimations = (anims : Phaser.Animations.AnimationManag
         repeat: 0,
         hideOnComplete: true
     });
+
+    anims.create({
+        key: ANIMS.PARACHUTE,
+        frameRate: 4,
+        frames: anims.generateFrameNumbers(ASSETS.LEMMING_PARACHUTE_SPRITESHEET, {start:0,end:0}),
+        repeat: -1
+    })
 }

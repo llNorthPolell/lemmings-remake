@@ -4,38 +4,46 @@ import Context from "../scripts/gameobjects/context";
 import Button from "../scripts/gameobjects/ui/button";
 import OverlayMenuPanel from "../scripts/gameobjects/ui/overlayMenu";
 
-export default class PauseMenu extends Phaser.Scene{
+export default class WinMenu extends Phaser.Scene{
+
     constructor(){
         super({
-            key:SCENES.PAUSE_MENU, 
+            key:SCENES.WIN_MENU, 
             active:true
         });
     }
 
     preload(){}
     create(){
-        const resumeBtn = new Button(
+        const gameResultText = this.add.container(0,0);
+
+        gameResultText.add(this.add.text(
+            0,0,"You Win!"
+        ).setOrigin(0));
+
+        const nextLevelBtn = new Button(
             this,
-            "RESUME",
-            "RESUME",
+            "NEXT_LEVEL",
+            "NEXT_LEVEL",
             {x:0,y:0},
             350,
             50,
             UI_BTN_COLOR,
-            ()=>{resumeBtn.bg.setFillStyle(UI_BTN_CLICK_COLOR)},
+            ()=>{nextLevelBtn.bg.setFillStyle(UI_BTN_CLICK_COLOR)},
             ()=>{
-                resumeBtn.bg.setFillStyle(UI_BTN_COLOR);
+                nextLevelBtn.bg.setFillStyle(UI_BTN_COLOR);
 
                 Context.paused=false;
-                this.game.scene.resume(SCENES.GAMEPLAY);
+                Context.restart=true;
+                this.game.scene.start(SCENES.GAMEPLAY,{level:Context.level+1});
                 this.game.scene.resume(SCENES.HUD);
-                
-                this.scene.setVisible(false);
-                this.scene.setActive(false);
+
+                this.scene.sleep();
             },
-            ()=>{resumeBtn!.bg.setFillStyle(UI_BTN_HOVER_COLOR)},
-            ()=>{resumeBtn!.bg.setFillStyle(UI_BTN_COLOR)}
+            ()=>{nextLevelBtn.bg.setFillStyle(UI_BTN_HOVER_COLOR)},
+            ()=>{nextLevelBtn.bg.setFillStyle(UI_BTN_COLOR)}
         );
+
 
         const restartBtn = new Button(
             this,
@@ -55,8 +63,7 @@ export default class PauseMenu extends Phaser.Scene{
 
                 this.game.scene.resume(SCENES.HUD);
 
-                this.scene.setVisible(false);
-                this.scene.setActive(false);
+                this.scene.sleep();
             },
             ()=>{restartBtn.bg.setFillStyle(UI_BTN_HOVER_COLOR)},
             ()=>{restartBtn.bg.setFillStyle(UI_BTN_COLOR)}
@@ -80,7 +87,8 @@ export default class PauseMenu extends Phaser.Scene{
         );
 
         const overlayMenu = new OverlayMenuPanel(this,[
-            resumeBtn,
+            gameResultText,
+            nextLevelBtn,
             restartBtn,
             mainMenuBtn
         ])
@@ -89,7 +97,7 @@ export default class PauseMenu extends Phaser.Scene{
         // to active will cause scene to skip create()
         this.scene.sleep();
     }
-    
+
     update(){
 
     }
