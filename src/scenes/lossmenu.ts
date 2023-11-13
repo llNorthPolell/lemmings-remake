@@ -62,7 +62,7 @@ export default class LossMenu extends Phaser.Scene{
             ()=>{mainMenuBtn.bg.setFillStyle(UI_BTN_COLOR)}
         );
 
-        const overlayMenu = new OverlayMenuPanel(this,[
+        new OverlayMenuPanel(this,[
             gameResultText,
             restartBtn,
             mainMenuBtn

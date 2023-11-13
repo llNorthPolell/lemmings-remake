@@ -59,12 +59,12 @@ export default class Lemming extends GameObject{
             LEMMING_SIZE.height/4,
             0xffff00,
             0.5,
-            (frontSensor,tile)=>{
+            (tile)=>{
                 if (tile !== this.bumpTile){
                     this.bumpTile = tile as Phaser.Tilemaps.Tile;
                 }
             },
-            (frontSensor, tile)=>{
+            (tile)=>{
                 return (tile as  Phaser.Tilemaps.Tile).collides;
             },
         );
@@ -78,12 +78,12 @@ export default class Lemming extends GameObject{
             LEMMING_SIZE.height/4,
             0x00ffff,
             0.5,
-            (frontSensor,tile)=>{
+            (tile)=>{
                 if (tile !== this.standingTile){
                     this.standingTile = tile as Phaser.Tilemaps.Tile;
                 }
             },
-            (frontSensor, tile)=>{
+            (tile)=>{
                 return (tile as  Phaser.Tilemaps.Tile).collides;
             },
         );
@@ -216,11 +216,11 @@ export default class Lemming extends GameObject{
             this.task = LemmingTask.IDLE;
     }
 
-    private setSlopeMovement(slopeAngle:number){
+    /*private setSlopeMovement(slopeAngle:number){
         const sprite = this.sprite! as Phaser.Physics.Arcade.Sprite;
         sprite.setRotation(slopeAngle);
         sprite.setOffset(0,-10);
-    }
+    }*/
 
     private updateVelocity(){
         const sprite = this.sprite as Phaser.Physics.Arcade.Sprite;
@@ -291,12 +291,12 @@ export default class Lemming extends GameObject{
             }
         }
           
-        if (this.standingTile){
+        /*if (this.standingTile){
             const properties = this.standingTile.properties;
             const tileBotY = this.standingTile.getBottom();     
             const tileLeftX = this.standingTile.getLeft();
 
-            /*if (properties?.slopeTile){
+            if (properties?.slopeTile){
                 // let tileLeftX = x_1, m=properties.slopeValue
                 // let x_0 = 0, y_0 = b (result from y=mx+b when x=0)
                 // y_0-y_1 / x_0-x_1 = m
@@ -322,8 +322,8 @@ export default class Lemming extends GameObject{
             }
             else {
                 body.setOffset(0,0);
-            }*/
-        }
+            }
+        }*/
 
         switch (this.task){
             case LemmingTask.BLOCK:

@@ -78,7 +78,7 @@ export default class PauseMenu extends Phaser.Scene{
             ()=>{mainMenuBtn.bg.setFillStyle(UI_BTN_COLOR)}
         );
 
-        const overlayMenu = new OverlayMenuPanel(this,[
+        new OverlayMenuPanel(this,[
             resumeBtn,
             restartBtn,
             mainMenuBtn

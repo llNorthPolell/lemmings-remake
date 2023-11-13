@@ -89,7 +89,7 @@ export default class WinMenu extends Phaser.Scene{
             ()=>{mainMenuBtn.bg.setFillStyle(UI_BTN_COLOR)}
         );
 
-        const overlayMenu = new OverlayMenuPanel(this,[
+        new OverlayMenuPanel(this,[
             gameResultText,
             nextLevelBtn,
             restartBtn,
