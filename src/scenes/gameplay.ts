@@ -31,15 +31,15 @@ export default class GameplayScene extends Phaser.Scene{
     }
 
     init(data:any){
-        const level = data.level;
-        if (level) console.log("Got level: "+ level);
-        Context.level = level? level:1;
+        Context.level = (data.level && data.level >0 && data.level <= 2)? data.level : 1;
     }
 
     preload(){
         this.load.image(ASSETS.TILE_SET, "src/assets/tilesets/tiles.png")
-        this.load.tilemapTiledJSON(ASSETS.TILE_MAP,`src/assets/levels/${Context.level}.json`);
-
+        for (let i =1 ; i <= 2; i++){
+            this.load.tilemapTiledJSON(ASSETS.TILE_MAP+i,`src/assets/levels/${i}.json`);
+        }
+        
         this.load.spritesheet(ASSETS.LEMMING_SPRITESHEET,"src/assets/sprites/lemming.png", {frameWidth:16,frameHeight:16});
         this.load.spritesheet(ASSETS.LEMMING_PARACHUTE_SPRITESHEET,"src/assets/sprites/lemming_parachute.png", {frameWidth:16,frameHeight:32});
         this.load.spritesheet(ASSETS.DOOR_SPRITESHEET,"src/assets/sprites/door.png", {frameWidth:60,frameHeight:60});
@@ -67,7 +67,7 @@ export default class GameplayScene extends Phaser.Scene{
     }
 
     private generateLevel(){
-        const map = this.make.tilemap({key:ASSETS.TILE_MAP, tileWidth:32, tileHeight:24});
+        const map = this.make.tilemap({key:ASSETS.TILE_MAP+Context.level, tileWidth:32, tileHeight:24});
         const tileset = map.addTilesetImage(ASSETS.TILE_MAP_TILE_SET_IMG,ASSETS.TILE_SET)!;
         this.tileImageLayer= map.createLayer(ASSETS.TILE_IMG_LAYER, tileset)!;
         

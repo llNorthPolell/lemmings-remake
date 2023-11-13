@@ -15,4 +15,4 @@ game.scene.add(SCENES.HUD,HUD);
 game.scene.add(SCENES.PAUSE_MENU,PauseMenu);
 game.scene.add(SCENES.LOSS_MENU,LossMenu);
 game.scene.add(SCENES.WIN_MENU,WinMenu);
-game.scene.start(SCENES.GAMEPLAY,{level:2});
+game.scene.start(SCENES.GAMEPLAY,{level:1});

@@ -223,15 +223,16 @@ export default class Lemming extends GameObject{
     }
 
     private updateVelocity(){
-        const sprite = this.sprite! as Phaser.Physics.Arcade.Sprite;
+        const sprite = this.sprite as Phaser.Physics.Arcade.Sprite;
+        if (!sprite) return;
         const state = this.stateManager.getState();
         if (state===this.idle){
             if (this.direction===Direction.RIGHT)
-                sprite!.setVelocityX(MOVESPEED);
+                sprite.setVelocityX(MOVESPEED);
             else if (this.direction===Direction.LEFT)
-                sprite!.setVelocityX(-MOVESPEED);
+                sprite.setVelocityX(-MOVESPEED);
         }
-        else sprite!.setVelocityX(0);      
+        else sprite.setVelocityX(0);      
     }
 
     private updateAnimation(){
@@ -266,7 +267,7 @@ export default class Lemming extends GameObject{
 
         if (this.animation !== animation){
             this.animation = animation;
-            this.sprite!.play(this.animation);
+            this.sprite?.play(this.animation);
         }
     }
 
@@ -547,14 +548,15 @@ export default class Lemming extends GameObject{
     }
 
     private exitDoor(){
-        Context.lemmingsSaved++;
         const sprite = this.sprite!;
         sprite.once(
             'animationcomplete',
             ()=>{
+                this.active=false;
                 Context.lemmingColliders.remove(sprite);
                 if (Context.selected === this)
                     Context.selected=undefined;
+                Context.lemmingsSaved++;
             }
         )
     }
@@ -562,6 +564,7 @@ export default class Lemming extends GameObject{
     private killLemming(){
         console.log("Casualty...");
         const sprite = this.sprite!;
+        this.active=false;
         Context.lemmingColliders.remove(sprite);
         Context.lemmingsDead++;
         if (Context.selected === this)

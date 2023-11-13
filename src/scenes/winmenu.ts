@@ -31,11 +31,13 @@ export default class WinMenu extends Phaser.Scene{
             UI_BTN_COLOR,
             ()=>{nextLevelBtn.bg.setFillStyle(UI_BTN_CLICK_COLOR)},
             ()=>{
+                console.log("Setting up Next Level");
                 nextLevelBtn.bg.setFillStyle(UI_BTN_COLOR);
 
-                Context.paused=false;
-                Context.restart=true;
-                this.game.scene.start(SCENES.GAMEPLAY,{level:Context.level+1});
+                const nextLevel = (Context.level > 0 && Context.level<=2)?Context.level + 1 : 1;
+                console.log("Next Level: "+nextLevel);
+
+                this.game.scene.start(SCENES.GAMEPLAY,{level:nextLevel});
                 this.game.scene.resume(SCENES.HUD);
 
                 this.scene.sleep();
@@ -55,6 +57,7 @@ export default class WinMenu extends Phaser.Scene{
             UI_BTN_COLOR,
             ()=>{restartBtn.bg.setFillStyle(UI_BTN_CLICK_COLOR)},
             ()=>{
+                console.log("Restarting");
                 restartBtn.bg.setFillStyle(UI_BTN_COLOR);
 
                 Context.paused=false;

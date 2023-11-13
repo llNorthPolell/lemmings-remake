@@ -30,6 +30,7 @@ export default class LossMenu extends Phaser.Scene{
             UI_BTN_COLOR,
             ()=>{restartBtn.bg.setFillStyle(UI_BTN_CLICK_COLOR)},
             ()=>{
+                console.log("Restarting");
                 restartBtn.bg.setFillStyle(UI_BTN_COLOR);
 
                 Context.paused=false;

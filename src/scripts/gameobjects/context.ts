@@ -8,7 +8,7 @@ export default class Context{
     static level : number = 1;
     static paused : boolean = false;
     static restart: boolean = false;
-    
+
     static tileImageLayer :Phaser.Tilemaps.TilemapLayer;
     static physics: Phaser.Physics.Arcade.ArcadePhysics;
     static lemmingColliders: Phaser.Physics.Arcade.Group;

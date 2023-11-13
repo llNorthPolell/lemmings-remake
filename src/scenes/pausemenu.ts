@@ -30,8 +30,7 @@ export default class PauseMenu extends Phaser.Scene{
                 this.game.scene.resume(SCENES.GAMEPLAY);
                 this.game.scene.resume(SCENES.HUD);
                 
-                this.scene.setVisible(false);
-                this.scene.setActive(false);
+                this.scene.sleep();
             },
             ()=>{resumeBtn!.bg.setFillStyle(UI_BTN_HOVER_COLOR)},
             ()=>{resumeBtn!.bg.setFillStyle(UI_BTN_COLOR)}
@@ -47,6 +46,7 @@ export default class PauseMenu extends Phaser.Scene{
             UI_BTN_COLOR,
             ()=>{restartBtn.bg.setFillStyle(UI_BTN_CLICK_COLOR)},
             ()=>{
+                console.log("Restarting");
                 restartBtn.bg.setFillStyle(UI_BTN_COLOR);
 
                 Context.paused=false;
@@ -55,8 +55,7 @@ export default class PauseMenu extends Phaser.Scene{
 
                 this.game.scene.resume(SCENES.HUD);
 
-                this.scene.setVisible(false);
-                this.scene.setActive(false);
+                this.scene.sleep();
             },
             ()=>{restartBtn.bg.setFillStyle(UI_BTN_HOVER_COLOR)},
             ()=>{restartBtn.bg.setFillStyle(UI_BTN_COLOR)}
