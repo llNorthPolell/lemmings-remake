@@ -35,14 +35,14 @@ export default class GameplayScene extends Phaser.Scene{
     }
 
     preload(){
-        this.load.image(ASSETS.TILE_SET, "src/assets/tilesets/tiles.png")
+        this.load.image(ASSETS.TILE_SET, "assets/tilesets/tiles.png")
         for (let i =1 ; i <= 2; i++){
-            this.load.tilemapTiledJSON(ASSETS.TILE_MAP+i,`src/assets/levels/${i}.json`);
+            this.load.tilemapTiledJSON(ASSETS.TILE_MAP+i,`assets/levels/${i}.json`);
         }
         
-        this.load.spritesheet(ASSETS.LEMMING_SPRITESHEET,"src/assets/sprites/lemming.png", {frameWidth:16,frameHeight:16});
-        this.load.spritesheet(ASSETS.LEMMING_PARACHUTE_SPRITESHEET,"src/assets/sprites/lemming_parachute.png", {frameWidth:16,frameHeight:32});
-        this.load.spritesheet(ASSETS.DOOR_SPRITESHEET,"src/assets/sprites/door.png", {frameWidth:60,frameHeight:60});
+        this.load.spritesheet(ASSETS.LEMMING_SPRITESHEET,"assets/sprites/lemming.png", {frameWidth:16,frameHeight:16});
+        this.load.spritesheet(ASSETS.LEMMING_PARACHUTE_SPRITESHEET,"assets/sprites/lemming_parachute.png", {frameWidth:16,frameHeight:32});
+        this.load.spritesheet(ASSETS.DOOR_SPRITESHEET,"assets/sprites/door.png", {frameWidth:60,frameHeight:60});
     }
 
     private spawn(gameobject: string, position: Position){

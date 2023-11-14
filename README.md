@@ -2,7 +2,7 @@
 
 Previously I've created a copy of Lemmings (code found in https://github.com/llNorthPolell/lemmings-remake) using pure HTML and JavaScript. 
 I have recreated it using PhaserJS 3 and React to learn and practice PhaserJS and JavaScript ES6. I have stopped working on this as I feel
-I have achieved learning the basics of PhaserJS 3.
+I have achieved learning the basics of PhaserJS 3. Code is hosted on GitHub pages found in <https://llnorthpolell.github.io/lemmings-remake/>. 
 
 ## Tech Stack:
 
