@@ -36,7 +36,8 @@ export default class WinMenu extends Phaser.Scene{
 
                 const nextLevel = (Context.level > 0 && Context.level<=2)?Context.level + 1 : 1;
                 console.log("Next Level: "+nextLevel);
-
+                Context.paused=false;
+                Context.restart=false;
                 this.game.scene.start(SCENES.GAMEPLAY,{level:nextLevel});
                 this.game.scene.resume(SCENES.HUD);
 
